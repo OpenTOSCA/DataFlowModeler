@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export default class Drawflow {
   constructor(container, render = null, parent = null) {
     this.events = {};
@@ -95,7 +97,7 @@ export default class Drawflow {
   }
 
   pointermove_handler(ev) {
-   for (var i = 0; i < this.evCache.length; i++) {
+   for (let i = 0; i < this.evCache.length; i++) {
      if (ev.pointerId == this.evCache[i].pointerId) {
         this.evCache[i] = ev;
      break;
@@ -104,7 +106,7 @@ export default class Drawflow {
 
    if (this.evCache.length == 2) {
      // Calculate the distance between the two pointers
-     var curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
+     let curDiff = Math.abs(this.evCache[0].clientX - this.evCache[1].clientX);
 
      if (this.prevDiff > 100) {
        if (curDiff > this.prevDiff) {
@@ -129,7 +131,7 @@ export default class Drawflow {
   }
   remove_event(ev) {
    // Remove this event from the target's cache
-   for (var i = 0; i < this.evCache.length; i++) {
+   for (let i = 0; i < this.evCache.length; i++) {
      if (this.evCache[i].pointerId == ev.pointerId) {
        this.evCache.splice(i, 1);
        break;
@@ -138,17 +140,17 @@ export default class Drawflow {
   }
   /* End Mobile Zoom */
   load() {
-    for (var key in this.drawflow.drawflow[this.module].data) {
+    for (let key in this.drawflow.drawflow[this.module].data) {
       this.addNodeImport(this.drawflow.drawflow[this.module].data[key], this.precanvas);
     }
 
     if(this.reroute) {
-      for (var key in this.drawflow.drawflow[this.module].data) {
+      for (let key in this.drawflow.drawflow[this.module].data) {
         this.addRerouteImport(this.drawflow.drawflow[this.module].data[key]);
       }
     }
 
-    for (var key in this.drawflow.drawflow[this.module].data) {
+    for (let key in this.drawflow.drawflow[this.module].data) {
       this.updateConnectionNodes('node-'+key);
     }
 
@@ -333,17 +335,21 @@ export default class Drawflow {
   }
 
   position(e) {
+    let e_pos_x=null;
+    let e_pos_y=null;
+    let x=null;
+    let y=null;
     if (e.type === "touchmove") {
-      var e_pos_x = e.touches[0].clientX;
-      var e_pos_y = e.touches[0].clientY;
+      e_pos_x = e.touches[0].clientX;
+      e_pos_y = e.touches[0].clientY;
     } else {
-      var e_pos_x = e.clientX;
-      var e_pos_y = e.clientY;
+      e_pos_x = e.clientX;
+      e_pos_y = e.clientY;
     }
 
 
     if(this.connection) {
-      this.updateConnection(e_pos_x, e_pos_y);
+      this.updateConnection(e_pos_x,e_pos_y);
     }
     if(this.editor_selected) {
       x =  this.canvas_x + (-(this.pos_x - e_pos_x))
@@ -353,8 +359,8 @@ export default class Drawflow {
     }
     if(this.drag) {
 
-      var x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
-      var y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
+      x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
+      y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
       this.pos_x = e_pos_x;
       this.pos_y = e_pos_y;
 
@@ -369,13 +375,13 @@ export default class Drawflow {
 
     if(this.drag_point) {
 
-      var x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
-      var y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
+      x = (this.pos_x - e_pos_x) * this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom);
+      y = (this.pos_y - e_pos_y) * this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom);
       this.pos_x = e_pos_x;
       this.pos_y = e_pos_y;
 
-      var pos_x = this.pos_x * ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)) - (this.precanvas.getBoundingClientRect().x * ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)));
-      var pos_y = this.pos_y * ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)) - (this.precanvas.getBoundingClientRect().y * ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)));
+      let pos_x = this.pos_x * ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)) - (this.precanvas.getBoundingClientRect().x * ( this.precanvas.clientWidth / (this.precanvas.clientWidth * this.zoom)));
+      let pos_y = this.pos_y * ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)) - (this.precanvas.getBoundingClientRect().y * ( this.precanvas.clientHeight / (this.precanvas.clientHeight * this.zoom)));
 
       this.ele_selected.setAttributeNS(null, 'cx', pos_x);
       this.ele_selected.setAttributeNS(null, 'cy', pos_y);
@@ -426,14 +432,14 @@ export default class Drawflow {
     }
 
     if(this.drag) {
-      if(this.pos_x_start != e_pos_x || this.pos_y_start != e_pos_y) {
+      if(this.pos_x_start !== e_pos_x || this.pos_y_start !== e_pos_y) {
         this.dispatch('nodeMoved', this.ele_selected.id.slice(5));
       }
     }
 
     if(this.drag_point) {
       this.ele_selected.classList.remove("selected");
-        if(this.pos_x_start != e_pos_x || this.pos_y_start != e_pos_y) {
+        if(this.pos_x_start !== e_pos_x || this.pos_y_start !== e_pos_y) {
           this.dispatch('rerouteMoved', this.ele_selected.parentElement.classList[2].slice(14));
         }
     }
@@ -1107,7 +1113,7 @@ export default class Drawflow {
       }
 
       if(this.reroute_fix_curvature) {
-        
+
         if(position_add_array_point > 0 || this.drawflow.drawflow[this.module].data[nodeId].outputs[output_class].connections[searchConnection].points !== []) {
           this.drawflow.drawflow[this.module].data[nodeId].outputs[output_class].connections[searchConnection].points.splice(position_add_array_point, 0, { pos_x: pos_x, pos_y: pos_y });
         } else {
@@ -1132,7 +1138,7 @@ export default class Drawflow {
     const output_class = ele.parentElement.classList[3];
     const input_class = ele.parentElement.classList[4];
 
-    let numberPointPosition = Array.from(ele.parentElement.children).indexOf(ele);    
+    let numberPointPosition = Array.from(ele.parentElement.children).indexOf(ele);
     const nodeId = nodeUpdate.slice(5);
     const searchConnection = this.drawflow.drawflow[this.module].data[nodeId].outputs[output_class].connections.findIndex(function(item,i) {
       return item.node ===  nodeUpdateIn && item.output === input_class;
