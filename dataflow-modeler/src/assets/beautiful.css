@@ -65,11 +65,21 @@ header a {
   user-select: none;
 }
 .menu {
+  margin: 0 auto;
+  text-align: center;
   position: absolute;
   height: 40px;
   display: block;
   background: white;
-  width: 100%;
+  width: 50%;
+}
+
+.menuClass {
+  margin: auto;
+  width: 50%;
+  border: 3px solid black;
+  padding: 2px;
+  display: flex;
 }
 .menu ul {
   padding: 0px;
@@ -89,27 +99,60 @@ cursor: pointer;
 .menu ul li.selected {
   font-weight: bold;
 }
+.text-filepath{
+  /*top: 10px;*/
+  /*right: 10px;*/
+  /*padding: 5px 10px;*/
+  /*border-radius: 4px;*/
+  /*z-index: 5;*/
+}
 
 .btn-export {
-  float: right;
-  position: absolute;
-  top: 10px;
-  right: 10px;
+  /*float:right ;*/
+  /*position: absolute;*/
+  /*top: 10px;*/
+  /*right: 10px;*/
+  /*width: 40px;*/
   color: white;
   font-weight: bold;
   border: 1px solid #0e5ba3;
   background: #4ea9ff;
+  /*padding: 5px 10px;*/
+  /*border-radius: 4px;*/
+  cursor: pointer;
+  /*z-index: 5;*/
+}
+.menuClass  *{
+  display: inline-block;
+  margin-left: 10px;
+  top: 10px;
+  right: 10px;
   padding: 5px 10px;
   border-radius: 4px;
-  cursor: pointer;
   z-index: 5;
+}
+
+.btn-save {
+  /*float:left ;*/
+  /*position: absolute;*/
+  /*top: 10px;*/
+  /*right: 10px;*/
+  /*width: 40px;*/
+  color: white;
+  font-weight: bold;
+  border: 1px solid #0e5ba3;
+  background: #4ea9ff;
+  /*padding: 5px 10px;*/
+  /*border-radius: 4px;*/
+  cursor: pointer;
+  /*z-index: 5;*/
 }
 
 .btn-clear {
   float: right;
   position: absolute;
   top: 10px;
-  right: 85px;
+  right: 10px;
   color: white;
   font-weight: bold;
   border: 1px solid #96015b;
@@ -165,7 +208,7 @@ cursor: pointer;
   position: relative;
   width: calc(100vw - 301px);
   height: calc(100% - 50px);
-  top: 40px;
+  /*top: 40px;*/
   background: var(--background-color);
   background-size: 25px 25px;
   background-image:

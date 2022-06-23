@@ -1,12 +1,14 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import store from "@/plugins/store";
-import '@/assets/beautiful.css'
+// import vuetify from "@/plugins/vuetify";
 import '@/assets/drawflow.css'
+import '@/assets/beautiful.css'
 
 
 const app= createApp(App)
-app.mount('#app')
 app.use(store)
+// app.use(vuetify)
+app.mount('#app')
 
 
