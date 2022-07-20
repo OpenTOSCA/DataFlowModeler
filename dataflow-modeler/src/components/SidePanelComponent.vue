@@ -1,13 +1,16 @@
 <template>
     <div class="col">
-      <div class="drag-drawflow" draggable="true" v-on:dragstart="flowEvents.drag" data-node="input">
-        <i class="fa-solid fa-input-pipe"></i><span> Input</span>
-      </div>
-      <div class="drag-drawflow" draggable="true" v-on:dragstart="flowEvents.drag" data-node="filter">
-        <i class="fa-solid fa-filter"></i><span> Filter</span>
-      </div>
-      <div class="drag-drawflow" draggable="true" v-on:dragstart="flowEvents.drag" data-node="output">
-        <i class="fa-thin fa-circle"></i><span> Output</span>
+      <h2>Palette</h2>
+      <div class="toolbox">
+        <div class="drag-drawflow circle" draggable="true" v-on:dragstart="flowEvents.drag" data-node="input">
+          <span>Input</span>
+        </div>
+        <div class="drag-drawflow rectangle" draggable="true" v-on:dragstart="flowEvents.drag" data-node="filter">
+          <span> Filter</span>
+        </div>
+        <div class="drag-drawflow circle" draggable="true" v-on:dragstart="flowEvents.drag" data-node="output">
+          <span>Output</span>
+        </div>
       </div>
     </div>
 </template>

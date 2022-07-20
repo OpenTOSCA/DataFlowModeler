@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
     <div class="col-right">
       <div class="menuClass">
@@ -7,17 +8,53 @@
         <input type="file" id="test" style="display:none" accept=".txt">
         <div class="btn-export" v-on:click="selectFile">Load</div>
       </div>
-      <div id="drawflow" v-on:drop="flowEvents.drop" v-on:dragover="flowEvents.allowDrop">
-        <div class="btn-clear" v-on:click="$store.getters.GetEditor.clearModuleSelected()">Clear</div>
-        <div class="btn-lock" @click="alert('hi')">
-          <i id="lock" class="fas fa-lock"></i>
-<!--          <i id="unlock" class="fas fa-lock-open" v-on:click="changeMode('unlock');"-->
-<!--             style="display:none;"></i>-->
+      <div class="col-right-sub">
+        <div id="drawflow" v-on:drop="flowEvents.drop" v-on:dragover="flowEvents.allowDrop">
+          <div class="btn-clear" v-on:click="$store.getters.GetEditor.clearModuleSelected()">Clear</div>
+          <!--        <div class="btn-lock" @click="alert('hi')">-->
+          <!--          <i id="lock" class="fas fa-lock"></i>-->
+          <!--&lt;!&ndash;          <i id="unlock" class="fas fa-lock-open" v-on:click="changeMode('unlock');"&ndash;&gt;-->
+          <!--&lt;!&ndash;             style="display:none;"></i>&ndash;&gt;-->
+          <!--        </div>-->
+          <!--        <div class="bar-zoom">-->
+          <!--          <i class="fas fa-search-minus" v-on:click="$store.getters.GetEditor.zoom_out()"></i>-->
+          <!--          <i class="fas fa-search" v-on:click="$store.getters.GetEditor.zoom_reset()"></i>-->
+          <!--          <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>-->
+          <!--        </div>-->
         </div>
-        <div class="bar-zoom">
-          <i class="fas fa-search-minus" v-on:click="$store.getters.GetEditor.zoom_out()"></i>
-          <i class="fas fa-search" v-on:click="$store.getters.GetEditor.zoom_reset()"></i>
-          <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>
+        <div class="drawflow-property" >
+          <p><b>Properties</b></p>
+          <div class="form-container">
+            <table id="propTable" style="width: 250px;">
+              <thead class="propTable-header">
+              <tr>
+                <th>
+                  <label><b>Key</b></label>
+                </th>
+                <th>
+                  <label><b>Value</b></label>
+                </th>
+              </tr>
+              </thead>
+              <tbody class="propTable-body">
+<!--              <tr>-->
+<!--                <td>-->
+<!--                  <input type="text" placeholder="Enter Key" name="key">-->
+<!--                </td>-->
+<!--                <td>-->
+<!--                  <input type="text" placeholder="Enter Value" name="value">-->
+<!--                </td>-->
+<!--                <td>-->
+<!--                  <button class="btn-delete" data-val="row-1" @click="deleteRow">x</button>-->
+<!--                </td>-->
+<!--              </tr>-->
+              </tbody>
+              <tfoot style="text-align: center">
+
+              </tfoot>
+            </table>
+          </div>
+          <button class="btn-prop" @click="addRow" style="width:50%;">+</button>
         </div>
       </div>
     </div>
@@ -28,6 +65,7 @@ import Drawflow from "@/assets/drawflow";
 import store from "@/plugins/store";
 import FlowEvents from "@/assets/flowevents";
 import Helper from "@/assets/helper";
+import $ from 'jquery';
 
 export default {
   name: "CanvasComponent",
@@ -35,12 +73,23 @@ export default {
     return{
       flowEvents: new FlowEvents(),
       helper:new Helper(),
+      drawflow: new Drawflow(),
       id: null,
       editor:null,
       mobileItemSelect : '',
       mobileLastMove : null,
       filename: '',
-      dataToImport : {"drawflow":{"Home":{"data":{"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n</div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n<div class=\"box\">\nGer Vars\n <textarea df-template></textarea>\nOutput template with vars\n </div>\n       </div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n<div>\n <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n      <div class=\"box\">\n<p>Enter repository url</p>\n<input type=\"text\" df-name>\n</div>\n</div>\n", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":341,"pos_y":191}}}}}
+      // dataToImport : {"drawflow":{"Home":{"data":{"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n</div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n<div class=\"box\">\nGer Vars\n <textarea df-template></textarea>\nOutput template with vars\n </div>\n       </div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n<div>\n <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n      <div class=\"box\">\n<p>Enter repository url</p>\n<input type=\"text\" df-name>\n</div>\n</div>\n", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":341,"pos_y":191}}}}}
+      dataToImport:{"drawflow":{"Home":{"data":{}}}},
+      newRow:'<tr><td><input type="text" class="input-field"' +
+          ' placeholder="Enter Key" name="key">\n' +
+          '                  </td>\n' +
+          '                  <td>\n' +
+          '                    <input type="text" class="input-field" placeholder="Enter Value" name="value">\n' +
+          '                  </td>\n' +
+          '                  <td>\n' +
+          '                    <button class="btn-propdelete">x</button>\n' +
+          '                  </td></tr>'
     }
   },
   mounted() {
@@ -63,8 +112,21 @@ export default {
       console.log("Node removed " + id);
     })
 
-    store.getters.GetEditor.on('nodeSelected', function(id) {
-      console.log("Node selected " + id);
+    store.getters.GetEditor.on('nodeSelected', function(properties) {
+      console.log("Node selected " + properties);
+      properties.forEach(function(item){
+        console.log(item.key);
+        $('#propTable > tbody >tr').remove();
+        $('#propTable > tbody').append(
+            `<tr><td><input type="text" class="input-field" placeholder="Enter Key" name="key" value="${item.key}"></td>` +
+            `<td><input type="text" class="input-field" placeholder="Enter Value" name="value" value="${item.value}"></td>` +
+            `<td><button class="btn-propdelete">x</button></td></tr>`);
+      })
+    })
+
+    store.getters.GetEditor.on('nodeUnselected', function(id) {
+      console.log("Node unselected " + id);
+      $('#propTable > tbody >tr').remove();
     })
 
     store.getters.GetEditor.on('moduleCreated', function(name) {
@@ -127,6 +189,17 @@ export default {
       //   console.log(f);
       // }
     }
+
+    $('.propTable-body').on('click', '.btn-propdelete', function(e){
+      e.target.closest("tr").remove();
+    });
+
+    $('.propTable-body').on('blur','.input-field',function (e){
+      // console.log(e.target.closest("input[name='key']"));
+      console.log(e.target.closest("input[name='value']"));
+      // store.getters.GetEditor.updateNodeProperty(e,{'key':e.target.value});
+      // alert(e.target.innerText);
+    })
   },
   methods: {
     selectFile(){
@@ -152,13 +225,25 @@ export default {
       }
     },
     ExportData(data){
-      let xmlData = this.helper.OBJtoXML(data);
-      console.log(xmlData);
-      let a = document.createElement("a");
-      let file = new Blob([data], {type: "text/plain;charset=utf-8"});
-      a.href = URL.createObjectURL(file);
-      a.download = this.filename;
-      a.click();
+      if(this.filename!=""){
+        let xmlData = this.helper.OBJtoXML(data);
+        console.log(xmlData);
+        let a = document.createElement("a");
+        let file = new Blob([data], {type: "text/plain;charset=utf-8"});
+        a.href = URL.createObjectURL(file);
+        a.download = this.filename;
+        a.click();
+      }
+      else{
+        alert("Please enter the file name !!")
+      }
+    },
+    addRow(){
+      $('#propTable > tbody').append(this.newRow);
+
+    },
+    deleteRow(e){
+      e.target.closest("tr").remove();
     }
   }
 }

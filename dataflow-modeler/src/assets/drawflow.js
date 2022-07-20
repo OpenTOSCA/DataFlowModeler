@@ -1,5 +1,5 @@
 /* eslint-disable */
-
+import store from "@/plugins/store";
 export default class Drawflow {
   constructor(container, render = null, parent = null) {
     this.events = {};
@@ -50,6 +50,7 @@ export default class Drawflow {
     // Mobile
     this.evCache = [];
     this.prevDiff = -1;
+    this.properties=null;
   }
 
   start () {
@@ -215,7 +216,11 @@ export default class Drawflow {
           this.connection_selected = null;
         }
         if(this.node_selected != this.ele_selected) {
-          this.dispatch('nodeSelected', this.ele_selected.id.slice(5));
+          // console.log(this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
+
+           this.dispatch('nodeSelected',this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
+          // const properties = this.ele_selected.getElementsByClassName('properties')[0];
+          // this.dispatch('nodeSelected', properties.outerHTML);
         }
         this.node_selected = this.ele_selected;
         this.node_selected.classList.add("selected");
@@ -332,6 +337,13 @@ export default class Drawflow {
       e.preventDefault();
     }
     this.dispatch('clickEnd', e);
+  }
+
+  updateNodeProperty(event,property){
+    if(property.key!=null){
+      this.drawflow.drawflow[this.module].data[event.target.closest(".drawflow_content_node").parentElement.id.slice(5)].properties.push({key:property.key,value:property.value});
+      console.log(this.drawflow.drawflow[this.module].data[event.target.closest(".drawflow_content_node").parentElement.id.slice(5)].properties);
+    }
   }
 
   position(e) {
@@ -663,7 +675,7 @@ export default class Drawflow {
   }
 
   drawConnection(ele) {
-    console.log(ele);
+    // console.log(ele);
     let connection = document.createElementNS('http://www.w3.org/2000/svg',"svg");
     this.connection_ele = connection;
     let path = document.createElementNS('http://www.w3.org/2000/svg',"path");
@@ -1069,6 +1081,32 @@ export default class Drawflow {
     if(e.target.classList[0] === 'point') {
         this.removeReroutePoint(e.target);
     }
+
+    // if(this.node_selected!=null){
+    //   // var popUpdiv= document.getElementById('divPop');
+    //   // console.log(popUpdiv);
+    //   // //popUpdiv.css({ left: this.node_selected.offsetLeft + this.node_selected.offsetWidth + 10, top: this.node_selected.offsetTop + this.node_selected.offsetHeight + 10 });
+    //   //
+    //   // if(popUpdiv.style.display==='none'){
+    //   //   popUpdiv.setAttribute("style", "left: "+this.node_selected.offsetLeft + this.node_selected.offsetWidth + 10+"; width:"+this.node_selected.offsetTop + this.node_selected.offsetHeight + 10+";");
+    //   //   popUpdiv.style.display='block'
+    //   // }
+    //   // else{
+    //   //   popUpdiv.setAttribute("style", "z-index:500;position:absolute;display:none");
+    //   //   popUpdiv.style.display='none';
+    //   // }
+    //   // // let nodeSelect= document.getElementById(this.)
+    //   // // var pos=nodeSelect.offset();
+    //   // // var h=nodeSelect.height();
+    //   // // var w=nodeSelect.width();
+    //   if(this.node_selected.hasChildNodes()){
+    //
+    //   }
+    //   let deletebox = document.createElement('div');
+    //   deletebox.classList.add("drawflow-property");
+    //   deletebox.innerHTML = "x";
+    //   this.node_selected.appendChild(deletebox);
+    // }
   }
 
   createReroutePoint(ele) {
@@ -1195,7 +1233,6 @@ export default class Drawflow {
     }
     const parent = document.createElement('div');
     parent.classList.add("parent-node");
-
     const node = document.createElement('div');
     node.innerHTML = "";
     node.setAttribute("id", "node-"+newNodeId);
@@ -1209,6 +1246,9 @@ export default class Drawflow {
 
     const outputs = document.createElement('div');
     outputs.classList.add("outputs");
+
+    // const properties = document.createElement('div');
+    // properties.classList.add("properties");
 
     const json_inputs = {}
     for(var x = 0; x < num_in; x++) {
@@ -1228,8 +1268,20 @@ export default class Drawflow {
       outputs.appendChild(output);
     }
 
+    // for(var x = 0; x < num_out; x++) {
+    //   const property = document.createElement('div');
+    //   property.classList.add("property");
+    //   const propertyvalue = document.createElement('div');
+    //   store.commit("SetPropertyData",{'id':html+'_'+newNodeId,'key':'test1','value':'value'})
+    //   store.commit("SetPropertyData",{'id':html+'_'+newNodeId,'key':'test2','value':'value'})
+    //   store.commit("RemovePropertyData",{'id':html+'_'+newNodeId,'key':'test1'});
+    //   json_properties["property_"+(x+1)] = { "property": []};
+    //   properties.appendChild(property);
+    // }
+
     const content = document.createElement('div');
     content.classList.add("drawflow_content_node");
+    html=`<div class="title-box">${html} ${newNodeId}</div>`;
     if(typenode === false) {
       content.innerHTML = html;
     } else if (typenode === true) {
@@ -1296,18 +1348,21 @@ export default class Drawflow {
     node.style.left = ele_pos_x + "px";
     parent.appendChild(node);
     this.precanvas.appendChild(parent);
+    let nodeName=name+' '+newNodeId;
     var json = {
       id: newNodeId,
-      name: name,
+      name: nodeName,
       data: data,
       class: classoverride,
       html: html,
       typenode: typenode,
       inputs: json_inputs,
       outputs: json_outputs,
+      properties: [{'key':'test','value':'value'}],
       pos_x: ele_pos_x,
       pos_y: ele_pos_y,
     }
+    store.commit("SetPropertyData",{'id':json.name});
     this.drawflow.drawflow[this.module].data[newNodeId] = json;
     this.dispatch('nodeCreated', newNodeId);
     if (!this.useuuid) {
@@ -1333,6 +1388,9 @@ export default class Drawflow {
 
     const outputs = document.createElement('div');
     outputs.classList.add("outputs");
+
+    const properties = document.createElement('div');
+    properties.classList.add("properties");
 
     Object.keys(dataNode.inputs).map(function(input_item, index) {
       const input = document.createElement('div');
@@ -1363,6 +1421,13 @@ export default class Drawflow {
       output.classList.add("output");
       output.classList.add("output_"+(x+1));
       outputs.appendChild(output);
+    }
+
+    for(var x = 0; x < Object.keys(dataNode.properties).length; x++) {
+      const property = document.createElement('div');
+      property.classList.add("property");
+      property.classList.add("property_"+(x+1));
+      properties.appendChild(property);
     }
 
     const content = document.createElement('div');
@@ -1429,11 +1494,14 @@ export default class Drawflow {
     node.appendChild(inputs);
     node.appendChild(content);
     node.appendChild(outputs);
+    node.appendChild(properties);
     node.style.top = dataNode.pos_y + "px";
     node.style.left = dataNode.pos_x + "px";
     parent.appendChild(node);
     this.precanvas.appendChild(parent);
   }
+
+
 
   addRerouteImport(dataNode) {
     const reroute_width = this.reroute_width

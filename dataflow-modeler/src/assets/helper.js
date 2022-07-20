@@ -9,19 +9,20 @@ export default class Helper{
 
         switch(name){
             case 'input':{
-                let input = `<div><div class="title-box"><i class="fab fa-facebook"></i> Input </div></div>`;
-                store.getters.GetEditor.addNode('input', 0,  1, pos_x, pos_y, 'input', {}, input );
+                // let input = `<div class="title-box">Input ${0}</div>`;
+                // let input = `Input`;
+                store.getters.GetEditor.addNode('input', 0,  1, pos_x, pos_y, 'input', {}, name );
                 break;
             }
             case 'filter':{
-                let filter = `<div><div class="title-box"><i class="fab fa-facebook"></i> Filter </div></div>`;
-                store.getters.GetEditor.addNode('filter', 1,  1, pos_x, pos_y, 'filter', {}, filter );
+                // let filter = `<div class="title-box">Filter</div>`;
+                store.getters.GetEditor.addNode('filter', 1,  1, pos_x, pos_y, 'filter', {}, name );
                 break;
             }
 
             case 'output':{
-                let output = `<div><div class="title-box"><i class="fab fa-facebook"></i> Output </div></div>`;
-                store.getters.GetEditor.addNode('output', 1,  0, pos_x, pos_y, 'output', {}, output );
+                // let output = `<div class="title-box">Output</div>`;
+                store.getters.GetEditor.addNode('output', 1,  0, pos_x, pos_y, 'output', {}, name );
                 break;
             }
         }

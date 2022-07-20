@@ -8,6 +8,7 @@
     <div class="wrapper">
       <side-panel-component></side-panel-component>
       <canvas-component></canvas-component>
+      <property-component></property-component>
     </div>
   </div>
 </template>
@@ -16,6 +17,7 @@
 
 import SidePanelComponent from "@/components/SidePanelComponent";
 import canvasComponent from "@/components/CanvasComponent";
+import propertyComponent from "@/components/PropertyComponent";
 // import MenuComponent from "@/components/MenuComponent";
 
 export default {
@@ -23,6 +25,7 @@ export default {
   components: {
     SidePanelComponent,
     canvasComponent,
+    propertyComponent
     // MenuComponent
   },
   /*beforeMount() {
