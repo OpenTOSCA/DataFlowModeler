@@ -217,8 +217,9 @@ export default class Drawflow {
         }
         if(this.node_selected != this.ele_selected) {
           // console.log(this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
-
-           this.dispatch('nodeSelected',this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
+           this.dispatch('nodeSelected',{"nodeId":this.ele_selected.id.slice(5),
+             "name":this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].name,
+             "properties":this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties});
           // const properties = this.ele_selected.getElementsByClassName('properties')[0];
           // this.dispatch('nodeSelected', properties.outerHTML);
         }
@@ -1359,6 +1360,7 @@ export default class Drawflow {
       inputs: json_inputs,
       outputs: json_outputs,
       properties: [{'key':'test','value':'value'}],
+      // properties: [],
       pos_x: ele_pos_x,
       pos_y: ele_pos_y,
     }
@@ -1717,6 +1719,22 @@ export default class Drawflow {
     this.updateConnectionNodes('node-'+id);
   }
 
+  addProperties(nodeId,property,value){
+    debugger;
+    let prop =this.drawflow.drawflow[this.module].data[nodeId].properties;
+    if(property=='key'){
+      if(!(prop.hasOwnProperty(value))){
+        this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':value,'value':''});
+      }
+    }
+    else{
+
+    }
+    debugger;
+  }
+  removeProperties(){
+
+  }
   removeNodeOutput(id, output_class) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -1955,18 +1973,146 @@ export default class Drawflow {
   }
   export () {
     console.log('export');
-    const dataExport = JSON.parse(JSON.stringify(this.drawflow));
-    this.dispatch('export', dataExport);
-    return dataExport;
+    //const dataExport = JSON.parse(JSON.stringify(this.drawflow));
+    let xmlData=this.convertJSONToXML(this.drawflow);
+    this.dispatch('export', xmlData);
+    return xmlData;
   }
 
   import (data, notifi = true) {
     this.clear();
     this.drawflow = JSON.parse(JSON.stringify(data));
+    //let convertedData=this.convertXmlToJSON(data);
     this.load();
     if(notifi) {
       this.dispatch('import', 'import');
     }
+  }
+
+  convertXmlToJSON(dataXML){
+    let dataJson=this.drawflow;
+    let data={};
+    let itemCount=1;
+    if(dataXML!=null){
+      let elements=dataXML.firstChild.childNodes;
+      for(let i=0; i<elements.length;i++){
+        let childNodes=elements[i].childNodes;
+        for(let j=0; j<childNodes.length;j++){
+          let subchildNodes=childNodes[j].childNodes;
+          let objElements={properties:[]};
+          for(let k=0;k<subchildNodes.length;k++){
+            switch(subchildNodes[k].nodeName){
+              case 'inputs':
+              case 'outputs':
+                if(Object.keys(subchildNodes[k].firstChild.childNodes).length>0){
+                  objElements[subchildNodes[k].nodeName]=JSON.parse(subchildNodes[k].firstChild.innerHTML);
+                }
+                else{
+                  objElements[subchildNodes[k].nodeName]=JSON.parse(subchildNodes[k].innerHTML);
+                }
+                break;
+              case 'properties':
+                let props=subchildNodes[k].childNodes;
+                for(let l=0;l<props.length;l++){
+                  objElements["properties"].push({"key":props[l].nodeName,"value":props[l].innerHTML});
+                }
+                break;
+              case 'typenode':
+                objElements[subchildNodes[k].nodeName]= subchildNodes[k].innerHTML==="true";
+                break;
+              case 'pos_x':
+              case 'pos_y':
+              case 'id':
+                objElements[subchildNodes[k].nodeName]= parseInt(subchildNodes[k].innerHTML);
+                break;
+              default:
+                objElements[subchildNodes[k].nodeName]=subchildNodes[k].innerHTML;
+            }
+
+          }
+          data[itemCount]=objElements;
+          itemCount++;
+        }
+      }
+      dataJson['drawflow']['Home']['data']=data;
+    }
+    return dataJson;
+
+  }
+
+  convertJSONToXML(data){
+    let doc = document.implementation.createDocument("", "", null);
+    let headTag = doc.createElement("Dataflow");
+    headTag.setAttribute("id","");
+    let filterTag=doc.createElement("Filters");
+    let inputTag=doc.createElement("Inputs");
+    let outputTag=doc.createElement("Outputs");
+    let pipeTag=doc.createElement("Pipes");
+    console.log(doc);
+    let innerData=data['drawflow']['Home']['data'];
+    for(let item in innerData){
+      let subTag = doc.createElement(innerData[item]['class']);
+      subTag.setAttribute("id",innerData[item]['name']);
+      for(let key in innerData[item]){
+        let childTag=doc.createElement(key);
+        switch(key){
+          // case 'inputs':
+          // case 'outputs':
+          //   if(Object.keys(innerData[item][key]).length>0){
+          //     for(let ip in innerData[item][key]){
+          //       let subChildTag=doc.createElement(ip);
+          //       subChildTag.innerHTML = JSON.stringify(innerData[item][key][ip]);
+          //       childTag.appendChild(subChildTag);
+          //     }
+          //   }
+          //   else{
+          //     debugger;
+          //     childTag.innerHTML=JSON.stringify({});
+          //   }
+          //   break;
+          case 'inputs':
+          case 'outputs':
+          case 'data':
+            childTag.innerHTML =JSON.stringify(innerData[item][key]);
+            break;
+          case 'properties':
+            for(let ip in innerData[item][key]){
+              debugger;
+              let subChildTag=doc.createElement(innerData[item][key][ip]['key']);
+              subChildTag.innerHTML = innerData[item][key][ip]['value'];
+              childTag.appendChild(subChildTag);
+            }
+            break;
+          default:
+            childTag.innerHTML =innerData[item][key];
+            break;
+        }
+        subTag.appendChild(childTag);
+        switch(innerData[item]['class']){
+          case 'input':
+            inputTag.appendChild(subTag);
+            break;
+          case 'output':
+            outputTag.appendChild(subTag);
+            break;
+          case 'filter':
+            filterTag.appendChild(subTag);
+            break;
+          case 'pipe':
+            pipeTag.appendChild(subTag);
+            break;
+        }
+      }
+
+    }
+    headTag.appendChild(inputTag);
+    headTag.appendChild(outputTag);
+    headTag.appendChild(filterTag);
+    headTag.appendChild(pipeTag);
+    doc.appendChild(headTag);
+    let xmlData = new XMLSerializer().serializeToString(doc);
+    return xmlData;
+
   }
 
   /* Events */

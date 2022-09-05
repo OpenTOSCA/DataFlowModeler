@@ -7,7 +7,8 @@ const store = createStore({
             editor:null,
             mobileLastMove:null,
             mobileItemSelect:null,
-            propertyData:{}
+            propertyData:{},
+            nodeProperty:null
         }
     },
     mutations: {
@@ -38,7 +39,11 @@ const store = createStore({
                 }
             }
             console.log(state.propertyData);
+        },
+        SetNodeProp(state,node){
+            state.nodeProperty=node
         }
+
     },
     getters:{
         GetEditor: function (state){
@@ -49,6 +54,9 @@ const store = createStore({
         },
         GetMobileItemSelect: function (state){
             return state.mobileItemSelect
+        },
+        GetNodeProp: function (state){
+            return state.nodeProperty
         }
     }
 })

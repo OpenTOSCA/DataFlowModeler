@@ -1,11 +1,11 @@
-/* eslint-disable */
+eslint-disable
 <template>
     <div class="col-right">
       <div class="menuClass">
         <label>Name</label>
         <input class="text-filepath" v-model="filename" placeholder="Enter the file name" type="text" style="flex: 1;font-size: 100%"><br><br>
-        <div class="btn-save" v-on:click="ExportData(JSON.stringify($store.getters.GetEditor.export(), null,4))">Save</div>
-        <input type="file" id="test" style="display:none" accept=".txt">
+        <div class="btn-save" v-on:click="ExportData($store.getters.GetEditor.export())">Save</div>
+        <input type="file" id="test" style="display:none" accept=".xml">
         <div class="btn-export" v-on:click="selectFile">Load</div>
       </div>
       <div class="col-right-sub">
@@ -22,11 +22,16 @@
           <!--          <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>-->
           <!--        </div>-->
         </div>
-        <div class="drawflow-property" >
+        <div class="drawflow-property">
           <p><b>Properties</b></p>
           <div class="form-container">
+            <span v-if="node!=null">
+              <label>Name:</label>
+              <span>&nbsp;</span>
+              <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
+            </span>
             <table id="propTable" style="width: 250px;">
-              <thead class="propTable-header">
+              <thead class="propTable-header" v-if="node!=null">
               <tr>
                 <th>
                   <label><b>Key</b></label>
@@ -36,25 +41,18 @@
                 </th>
               </tr>
               </thead>
-              <tbody class="propTable-body">
-<!--              <tr>-->
-<!--                <td>-->
-<!--                  <input type="text" placeholder="Enter Key" name="key">-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                  <input type="text" placeholder="Enter Value" name="value">-->
-<!--                </td>-->
-<!--                <td>-->
-<!--                  <button class="btn-delete" data-val="row-1" @click="deleteRow">x</button>-->
-<!--                </td>-->
-<!--              </tr>-->
+              <tbody class="propTable-body" :data-node="node.nodeId" v-if="node!=null">
+              <template v-for="prop in node.properties" :key="prop">
+                <tr :name="prop.key">
+                  <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" @blur="modifyProp"></td>
+                  <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" @blur="modifyProp"></td>
+                  <td><button class="btn-propdelete">x</button></td>
+                </tr>
+              </template>
               </tbody>
-              <tfoot style="text-align: center">
-
-              </tfoot>
             </table>
           </div>
-          <button class="btn-prop" @click="addRow" style="width:50%;">+</button>
+          <button class="btn-prop" @click="addRow" style="width:50%;" v-if="node!=null">+</button>
         </div>
       </div>
     </div>
@@ -74,7 +72,6 @@ export default {
       flowEvents: new FlowEvents(),
       helper:new Helper(),
       drawflow: new Drawflow(),
-      id: null,
       editor:null,
       mobileItemSelect : '',
       mobileLastMove : null,
@@ -91,6 +88,25 @@ export default {
           '                    <button class="btn-propdelete">x</button>\n' +
           '                  </td></tr>'
     }
+  },
+  computed:{
+    node:function(){
+      return store.getters.GetNodeProp;
+    },
+    // nodeId:function (){
+    //   let node=store.getters.GetNodeProp;
+    //   if(node!=null){
+    //     return store.getters.GetNodeProp['nodeId'];
+    //   }
+    //   else{
+    //     return null;
+    //   }
+    //
+    // },
+    // nodeProperty:function(){
+    //   console.log("prop",store.getters.GetNodeProp['properties']);
+    //   return store.getters.GetNodeProp['properties'];
+    // }
   },
   mounted() {
     this.id = document.getElementById("drawflow")
@@ -112,20 +128,13 @@ export default {
       console.log("Node removed " + id);
     })
 
-    store.getters.GetEditor.on('nodeSelected', function(properties) {
-      console.log("Node selected " + properties);
-      properties.forEach(function(item){
-        console.log(item.key);
-        $('#propTable > tbody >tr').remove();
-        $('#propTable > tbody').append(
-            `<tr><td><input type="text" class="input-field" placeholder="Enter Key" name="key" value="${item.key}"></td>` +
-            `<td><input type="text" class="input-field" placeholder="Enter Value" name="value" value="${item.value}"></td>` +
-            `<td><button class="btn-propdelete">x</button></td></tr>`);
-      })
+    store.getters.GetEditor.on('nodeSelected', async function(node) {
+      store.commit('SetNodeProp',node);
     })
 
     store.getters.GetEditor.on('nodeUnselected', function(id) {
       console.log("Node unselected " + id);
+      store.commit('SetNodeProp',null);
       $('#propTable > tbody >tr').remove();
     })
 
@@ -182,8 +191,10 @@ export default {
       const selectedFile=fileInput.files[0];
       this.filename=selectedFile.name;
       const fileContent = await selectedFile.text();
-      this.dataToImport= JSON.parse(fileContent);
-      store.getters.GetEditor.import(this.dataToImport);
+      let parser = new DOMParser();
+      let dataToImport=  store.getters.GetEditor.convertXmlToJSON(parser.parseFromString(fileContent,"application/xml"));
+      // this.dataToImport= JSON.parse(fileContent);
+      store.getters.GetEditor.import(dataToImport);
       // const selectedFiles = [...fileInput.files];
       // for (const f of selectedFiles) {
       //   console.log(f);
@@ -194,14 +205,26 @@ export default {
       e.target.closest("tr").remove();
     });
 
-    $('.propTable-body').on('blur','.input-field',function (e){
-      // console.log(e.target.closest("input[name='key']"));
-      console.log(e.target.closest("input[name='value']"));
+    $('.propTable-body').on('blur','.input-field',function (){
+      // let element=e.target.closest("input[name='value']");
+      console.log("node id:",$('#propTable > tbody').data("node"));
+      console.log($(this).closest('input[name="value"]').attr('name'));
+      store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
       // store.getters.GetEditor.updateNodeProperty(e,{'key':e.target.value});
       // alert(e.target.innerText);
-    })
+    });
+
+    $('.form-container').on('blur', '.input-name', function(){
+      alert($(this).val());
+    });
+
+
   },
   methods: {
+    modifyProp(e){
+      console.log(e.target.name);
+      // store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
+    },
     selectFile(){
       let file=document.getElementById("test");
       file.click();
@@ -226,10 +249,9 @@ export default {
     },
     ExportData(data){
       if(this.filename!=""){
-        let xmlData = this.helper.OBJtoXML(data);
-        console.log(xmlData);
+        //let xmlData = this.helper.OBJtoXML(data);
         let a = document.createElement("a");
-        let file = new Blob([data], {type: "text/plain;charset=utf-8"});
+        let file = new Blob([data], {type: "application/xml;charset=utf-8"});
         a.href = URL.createObjectURL(file);
         a.download = this.filename;
         a.click();
@@ -244,7 +266,13 @@ export default {
     },
     deleteRow(e){
       e.target.closest("tr").remove();
-    }
+    },
+    setProperty(node) {
+  alert('hhhh');
+  this.nodeId=node["nodeId"];
+  this.nodeProperty=node["properties"];
+}
+
   }
 }
 </script>
