@@ -1719,17 +1719,35 @@ export default class Drawflow {
     this.updateConnectionNodes('node-'+id);
   }
 
-  addProperties(nodeId,property,value){
-    debugger;
-    let prop =this.drawflow.drawflow[this.module].data[nodeId].properties;
-    if(property=='key'){
-      if(!(prop.hasOwnProperty(value))){
-        this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':value,'value':''});
+  addNodeProperties(nodeId,nodeData){
+    this.drawflow.drawflow[this.module].data[nodeId].properties=[];
+    for (let i=0; i<nodeData.length; i++) {
+      if(nodeData[i].name==='nodeName'){
+
+      }
+      else if(nodeData[i].name==='key'){
+        console.log(i,nodeData[i].value,nodeData[i+1].value);
+        this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
       }
     }
-    else{
-
-    }
+    // $(nodeData).each(function(i, field){
+    //   if(field.name==='nodeName'){
+    //
+    //   }
+    //   else if(field.name==='key'){
+    //     console.log(i,field.value,nodeData[i+1].value);
+    //     debugger;
+    //     this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':field.value,'value':nodeData[i+1].value});
+    //   }
+    // });
+    // if(property=='key'){
+    //   if(!(prop.hasOwnProperty(value))){
+    //     this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':value,'value':''});
+    //   }
+    // }
+    // else{
+    //
+    // }
     debugger;
   }
   removeProperties(){

@@ -24,7 +24,8 @@ eslint-disable
         </div>
         <div class="drawflow-property">
           <p><b>Properties</b></p>
-          <div class="form-container">
+          <button v-on:click="saveProperty">Save</button>
+          <form class="form-container">
             <span v-if="node!=null">
               <label>Name:</label>
               <span>&nbsp;</span>
@@ -51,7 +52,7 @@ eslint-disable
               </template>
               </tbody>
             </table>
-          </div>
+          </form>
           <button class="btn-prop" @click="addRow" style="width:50%;" v-if="node!=null">+</button>
         </div>
       </div>
@@ -205,18 +206,18 @@ export default {
       e.target.closest("tr").remove();
     });
 
-    $('.propTable-body').on('blur','.input-field',function (){
-      // let element=e.target.closest("input[name='value']");
-      console.log("node id:",$('#propTable > tbody').data("node"));
-      console.log($(this).closest('input[name="value"]').attr('name'));
-      store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
-      // store.getters.GetEditor.updateNodeProperty(e,{'key':e.target.value});
-      // alert(e.target.innerText);
-    });
+    // $('.propTable-body').on('blur','.input-field',function (){
+    //   // let element=e.target.closest("input[name='value']");
+    //   console.log("node id:",$('#propTable > tbody').data("node"));
+    //   console.log($(this).closest('input[name="value"]').attr('name'));
+    //   store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
+    //   // store.getters.GetEditor.updateNodeProperty(e,{'key':e.target.value});
+    //   // alert(e.target.innerText);
+    // });
 
-    $('.form-container').on('blur', '.input-name', function(){
-      alert($(this).val());
-    });
+    // $('.form-container').on('blur', '.input-name', function(){
+    //   alert($(this).val());
+    // });
 
 
   },
@@ -267,10 +268,10 @@ export default {
     deleteRow(e){
       e.target.closest("tr").remove();
     },
-    setProperty(node) {
-  alert('hhhh');
-  this.nodeId=node["nodeId"];
-  this.nodeProperty=node["properties"];
+    saveProperty() {
+      let formData= $('form').serializeArray();
+      store.getters.GetEditor.addNodeProperties($('#propTable > tbody').data("node"),formData);
+      console.log(formData);
 }
 
   }
