@@ -24,7 +24,7 @@ eslint-disable
         </div>
         <div class="drawflow-property">
           <p><b>Properties</b></p>
-          <button v-on:click="saveProperty">Save</button>
+          <button v-if="node!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
           <form class="form-container">
             <span v-if="node!=null">
               <label>Name:</label>
@@ -116,7 +116,6 @@ export default {
     store.getters.GetEditor.reroute = true;
     store.getters.GetEditor.reroute_fix_curvature = true;
     store.getters.GetEditor.force_first_input = false;
-    console.log(store.getters.GetEditor)
 
     store.getters.GetEditor.start();
     store.getters.GetEditor.import(this.dataToImport);
@@ -271,7 +270,6 @@ export default {
     saveProperty() {
       let formData= $('form').serializeArray();
       store.getters.GetEditor.addNodeProperties($('#propTable > tbody').data("node"),formData);
-      console.log(formData);
 }
 
   }

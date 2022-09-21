@@ -142,6 +142,7 @@ export default class Drawflow {
   /* End Mobile Zoom */
   load() {
     for (let key in this.drawflow.drawflow[this.module].data) {
+      debugger;
       this.addNodeImport(this.drawflow.drawflow[this.module].data[key], this.precanvas);
     }
 
@@ -1723,13 +1724,17 @@ export default class Drawflow {
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
     for (let i=0; i<nodeData.length; i++) {
       if(nodeData[i].name==='nodeName'){
-
+        this.drawflow.drawflow[this.module].data[nodeId].name=nodeData[i].value;
+        this.drawflow.drawflow[this.module].data[nodeId].html=`<div class="title-box">${nodeData[i].value}</div>`;
       }
       else if(nodeData[i].name==='key'){
         console.log(i,nodeData[i].value,nodeData[i+1].value);
         this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
       }
     }
+    //this.precanvas.innerHTML = "";
+    debugger;
+    this.load();
     // $(nodeData).each(function(i, field){
     //   if(field.name==='nodeName'){
     //
@@ -1748,7 +1753,7 @@ export default class Drawflow {
     // else{
     //
     // }
-    debugger;
+    // this.removeNodeId('node-'+nodeId);
   }
   removeProperties(){
 
