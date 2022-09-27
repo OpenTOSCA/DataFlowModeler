@@ -27,6 +27,7 @@ eslint-disable
           <button v-if="node!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
           <form class="form-container">
             <span v-if="node!=null">
+              <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
               <label>Name:</label>
               <span>&nbsp;</span>
               <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
@@ -47,7 +48,7 @@ eslint-disable
                 <tr :name="prop.key">
                   <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" @blur="modifyProp"></td>
                   <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" @blur="modifyProp"></td>
-                  <td><button class="btn-propdelete">x</button></td>
+                  <td><button class="btn-propdelete" @click="deleteRow">x</button></td>
                 </tr>
               </template>
               </tbody>
@@ -79,15 +80,15 @@ export default {
       filename: '',
       // dataToImport : {"drawflow":{"Home":{"data":{"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n</div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n<div class=\"box\">\nGer Vars\n <textarea df-template></textarea>\nOutput template with vars\n </div>\n       </div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n<div>\n <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n      <div class=\"box\">\n<p>Enter repository url</p>\n<input type=\"text\" df-name>\n</div>\n</div>\n", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":341,"pos_y":191}}}}}
       dataToImport:{"drawflow":{"Home":{"data":{}}}},
-      newRow:'<tr><td><input type="text" class="input-field"' +
-          ' placeholder="Enter Key" name="key">\n' +
-          '                  </td>\n' +
-          '                  <td>\n' +
-          '                    <input type="text" class="input-field" placeholder="Enter Value" name="value">\n' +
-          '                  </td>\n' +
-          '                  <td>\n' +
-          '                    <button class="btn-propdelete">x</button>\n' +
-          '                  </td></tr>'
+      // newRow:'<tr><td><input type="text" class="input-field"' +
+      //     ' placeholder="Enter Key" name="key">\n' +
+      //     '                  </td>\n' +
+      //     '                  <td>\n' +
+      //     '                    <input type="text" class="input-field" placeholder="Enter Value" name="value">\n' +
+      //     '                  </td>\n' +
+      //     '                  <td>\n' +
+      //     '                    <button class="btn-propdelete">x</button>\n' +
+      //     '                  </td></tr>'
     }
   },
   computed:{
@@ -129,6 +130,7 @@ export default {
     })
 
     store.getters.GetEditor.on('nodeSelected', async function(node) {
+      console.log("Node selected " + node.nodeId);
       store.commit('SetNodeProp',node);
     })
 
@@ -201,9 +203,9 @@ export default {
       // }
     }
 
-    $('.propTable-body').on('click', '.btn-propdelete', function(e){
-      e.target.closest("tr").remove();
-    });
+    // $('.propTable-body').on('click', '.btn-propdelete', function(e){
+    //   e.target.closest("tr").remove();
+    // });
 
     // $('.propTable-body').on('blur','.input-field',function (){
     //   // let element=e.target.closest("input[name='value']");
@@ -261,7 +263,8 @@ export default {
       }
     },
     addRow(){
-      $('#propTable > tbody').append(this.newRow);
+      //$('#propTable > tbody').append(this.newRow);
+      this.node.properties.push({'key':'','value':''});
 
     },
     deleteRow(e){
@@ -269,7 +272,8 @@ export default {
     },
     saveProperty() {
       let formData= $('form').serializeArray();
-      store.getters.GetEditor.addNodeProperties($('#propTable > tbody').data("node"),formData);
+      //console.log('Id save prop:'+$('#propTable > tbody').data("node"));
+      store.getters.GetEditor.addNodeProperties(formData);
 }
 
   }
