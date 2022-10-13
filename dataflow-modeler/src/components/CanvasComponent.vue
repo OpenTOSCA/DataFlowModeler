@@ -11,26 +11,45 @@ eslint-disable
       <div class="col-right-sub">
         <div id="drawflow" v-on:drop="flowEvents.drop" v-on:dragover="flowEvents.allowDrop">
           <div class="btn-clear" v-on:click="$store.getters.GetEditor.clearModuleSelected()">Clear</div>
-          <!--        <div class="btn-lock" @click="alert('hi')">-->
-          <!--          <i id="lock" class="fas fa-lock"></i>-->
-          <!--&lt;!&ndash;          <i id="unlock" class="fas fa-lock-open" v-on:click="changeMode('unlock');"&ndash;&gt;-->
-          <!--&lt;!&ndash;             style="display:none;"></i>&ndash;&gt;-->
-          <!--        </div>-->
-          <!--        <div class="bar-zoom">-->
-          <!--          <i class="fas fa-search-minus" v-on:click="$store.getters.GetEditor.zoom_out()"></i>-->
-          <!--          <i class="fas fa-search" v-on:click="$store.getters.GetEditor.zoom_reset()"></i>-->
-          <!--          <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>-->
-          <!--        </div>-->
+<!--          <div class="btn-lock">-->
+<!--            <i id="lock" class="fas fa-lock" v-on:click="changeMode('lock');"></i>-->
+<!--            <i id="unlock" class="fas fa-lock-open" v-on:click="changeMode('unlock');" style="display:none;"></i>-->
+<!--          </div>-->
+<!--          <div class="bar-zoom">-->
+<!--            <i class="fas fa-search-minus" v-on:click="$store.getters.GetEditor.zoom_out()"></i>-->
+<!--            <i class="fas fa-search" v-on:click="$store.getters.GetEditor.zoom_reset()"></i>-->
+<!--            <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>-->
+<!--          </div>-->
         </div>
         <div class="drawflow-property">
           <p><b>Properties</b></p>
           <button v-if="node!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
-          <form class="form-container">
+          <form class="form-container" style="width: 250px">
             <span v-if="node!=null">
-              <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
-              <label>Name:</label>
-              <span>&nbsp;</span>
-              <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
+                <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
+                <label>Name:</label>
+                <span>&nbsp;</span>
+                <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
+                <label>Namespace:</label>
+                <span>&nbsp;</span>
+                <select v-model="selectedNamespace" style="max-width: 100%" @change="changeNameSpace">
+                  <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
+                </select>
+                <label>Type:</label>
+                <span>&nbsp;</span>
+                <select v-model="selectedType" style="max-width: 100%" v-if="selectedNamespace!=null">
+                  <option v-for="type in Types" :key="type">{{type}}</option>
+                </select>
+                <label>Provider:</label>
+                <span>&nbsp;</span>
+                <select v-model="selectedProvider" style="max-width: 100%" @change="changeProvider">
+                  <option v-for="provider in options.Provider" :key="provider">{{provider.name}}</option>
+                </select>
+                <label>Location:</label>
+                <span>&nbsp;</span>
+                <select v-model="selectedLocation" style="max-width: 100%" v-if="selectedProvider!=null" >
+                  <option v-for="location in Location" :key="location">{{location}}</option>
+                </select>
             </span>
             <table id="propTable" style="width: 250px;">
               <thead class="propTable-header" v-if="node!=null">
@@ -46,8 +65,8 @@ eslint-disable
               <tbody class="propTable-body" :data-node="node.nodeId" v-if="node!=null">
               <template v-for="prop in node.properties" :key="prop">
                 <tr :name="prop.key">
-                  <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" @blur="modifyProp"></td>
-                  <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" @blur="modifyProp"></td>
+                  <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" @change="updateRow"></td>
+                  <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" @change="updateRow"></td>
                   <td><button class="btn-propdelete" @click="deleteRow">x</button></td>
                 </tr>
               </template>
@@ -78,8 +97,15 @@ export default {
       mobileItemSelect : '',
       mobileLastMove : null,
       filename: '',
-      // dataToImport : {"drawflow":{"Home":{"data":{"4":{"id":4,"name":"email","data":{},"class":"email","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-at\"></i> Send Email </div>\n</div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"5","input":"output_1"}]}},"outputs":{},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":1033,"pos_y":439},"5":{"id":5,"name":"template","data":{"template":"Write your template"},"class":"template","html":"\n<div>\n<div class=\"title-box\"><i class=\"fas fa-code\"></i> Template</div>\n<div class=\"box\">\nGer Vars\n <textarea df-template></textarea>\nOutput template with vars\n </div>\n       </div>\n", "typenode": false, "inputs":{"input_1":{"connections":[{"node":"6","input":"output_1"}]}},"outputs":{"output_1":{"connections":[{"node":"4","output":"input_1"},{"node":"11","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":607,"pos_y":304},"6":{"id":6,"name":"github","data":{"name":"https://github.com/jerosoler/Drawflow"},"class":"github","html":"\n<div>\n <div class=\"title-box\"><i class=\"fab fa-github \"></i> Github Stars</div>\n      <div class=\"box\">\n<p>Enter repository url</p>\n<input type=\"text\" df-name>\n</div>\n</div>\n", "typenode": false, "inputs":{},"outputs":{"output_1":{"connections":[{"node":"5","output":"input_1"}]}},"property":{"properties":[{"key":"test1","value":"10"},{"key":"test1","value":"10"}]},"pos_x":341,"pos_y":191}}}}}
+      selectedNamespace:'',
+      Types:[],
+      selectedType:'',
+      selectedProvider:'',
+      Location:[],
+      selectedLocation:'',
       dataToImport:{"drawflow":{"Home":{"data":{}}}},
+       prop:{'key':'','value':''},
+      option: store.getters.GetOptions
       // newRow:'<tr><td><input type="text" class="input-field"' +
       //     ' placeholder="Enter Key" name="key">\n' +
       //     '                  </td>\n' +
@@ -94,6 +120,9 @@ export default {
   computed:{
     node:function(){
       return store.getters.GetNodeProp;
+    },
+    options:function(){
+      return store.getters.GetOptions;
     },
     // nodeId:function (){
     //   let node=store.getters.GetNodeProp;
@@ -195,12 +224,7 @@ export default {
       const fileContent = await selectedFile.text();
       let parser = new DOMParser();
       let dataToImport=  store.getters.GetEditor.convertXmlToJSON(parser.parseFromString(fileContent,"application/xml"));
-      // this.dataToImport= JSON.parse(fileContent);
       store.getters.GetEditor.import(dataToImport);
-      // const selectedFiles = [...fileInput.files];
-      // for (const f of selectedFiles) {
-      //   console.log(f);
-      // }
     }
 
     // $('.propTable-body').on('click', '.btn-propdelete', function(e){
@@ -216,28 +240,17 @@ export default {
     //   // alert(e.target.innerText);
     // });
 
-    // $('.form-container').on('blur', '.input-name', function(){
-    //   alert($(this).val());
-    // });
 
 
   },
   methods: {
-    modifyProp(e){
-      console.log(e.target.name);
-      // store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
-    },
     selectFile(){
       let file=document.getElementById("test");
       file.click();
-      // if(document.getElementById("test").value != ""){
-      //   // do stuff here
-      //   let files = document.getElementById("test")[0].files;
-      //   console.log(files);
-      // }
 
     },
     changeMode(option) {
+      console.log(option);
       let lock=document.getElementById("lock")
       let unlock=document.getElementById("unlock")
       console.log(lock,unlock)
@@ -264,17 +277,29 @@ export default {
     },
     addRow(){
       //$('#propTable > tbody').append(this.newRow);
-      this.node.properties.push({'key':'','value':''});
+      console.log(this.node.properties[this.node.properties.length-1]);
+      this.node.properties.push(this.prop);
 
     },
-    deleteRow(e){
-      e.target.closest("tr").remove();
+    updateRow(event){
+      let key=event.target.closest("tr").cells[0].children[0].value;
+      let value=event.target.closest("tr").cells[1].children[0].value;
+      this.node.properties[this.node.properties.length-1]={'key':key,'value':value};
+    },
+    deleteRow(event){
+      event.target.closest("tr").remove();
     },
     saveProperty() {
       let formData= $('form').serializeArray();
       //console.log('Id save prop:'+$('#propTable > tbody').data("node"));
       store.getters.GetEditor.addNodeProperties(formData);
-}
+    },
+    changeNameSpace(){
+      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.selectedNamespace))[0].type;
+    },
+    changeProvider(){
+      this.Location= (this.options.Provider.filter((ns)=> ns.name=== this.selectedProvider))[0].location;
+    }
 
   }
 }

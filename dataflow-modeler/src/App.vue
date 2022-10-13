@@ -17,7 +17,9 @@
 
 import SidePanelComponent from "@/components/SidePanelComponent";
 import canvasComponent from "@/components/CanvasComponent";
-import propertyComponent from "@/components/PropertyComponent";
+import store from "@/plugins/store";
+import axios from "axios";
+// import propertyComponent from "@/components/PropertyComponent";
 // import MenuComponent from "@/components/MenuComponent";
 
 export default {
@@ -25,14 +27,16 @@ export default {
   components: {
     SidePanelComponent,
     canvasComponent,
-    propertyComponent
+    // propertyComponent
     // MenuComponent
   },
-  /*beforeMount() {
-    let jQueryScript = document.createElement('script');
-    jQueryScript.setAttribute('src','https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
-    document.body.appendChild(jQueryScript);
-  }*/
+  beforeMount() {
+    axios
+        .get("Options.json")
+        .then(response =>{
+          store.commit("SetOptions",response.data)
+        })
+  }
 }
 </script>
 

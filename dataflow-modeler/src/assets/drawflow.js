@@ -219,7 +219,6 @@ export default class Drawflow {
         if(this.node_selected != this.ele_selected) {
           // console.log(this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
           let index= $.map(this.drawflow.drawflow[this.module].data,Object).findIndex(el=>el.id === parseInt(this.ele_selected.id.slice(5)));
-          debugger;
            this.dispatch('nodeSelected',{"nodeId":index+1,
              "name":this.drawflow.drawflow[this.module].data[index+1].name,
              "properties":this.drawflow.drawflow[this.module].data[index+1].properties});
@@ -2044,7 +2043,9 @@ export default class Drawflow {
                 case 'properties':
                   let props=subchildNodes[k].childNodes;
                   for(let l=0;l<props.length;l++){
-                    objElements["properties"].push({"key":props[l].nodeName,"value":props[l].innerHTML});
+                    debugger;
+                    objElements["properties"].push({"key":props[l].childNodes[0].innerHTML,"value":props[l].childNodes[1].innerHTML});
+                    //objElements["properties"].push({"key":props[l].nodeName,"value":props[l].innerHTML});
                   }
                   break;
                 case 'typenode':
@@ -2074,8 +2075,8 @@ export default class Drawflow {
 
   convertJSONToXML(data){
     let doc = document.implementation.createDocument("", "", null);
-    let headTag = doc.createElement("Dataflow");
-    // headTag.setAttribute("id","");
+    let headTag = doc.createElement("DataflowModel");
+    headTag.setAttribute("id","");
     let filterTag=doc.createElement("Filters");
     let inputTag=doc.createElement("Inputs");
     let outputTag=doc.createElement("Outputs");
@@ -2141,9 +2142,14 @@ export default class Drawflow {
             break;
           case 'properties':
             for(let ip in innerData[item][key]){
-              let subChildTag=doc.createElement(innerData[item][key][ip]['key']);
-              subChildTag.innerHTML = innerData[item][key][ip]['value'];
-              childTag.appendChild(subChildTag);
+              let entryTag=doc.createElement("entry");
+              let keyTag=doc.createElement("key");
+              let valueTag=doc.createElement("value");
+              keyTag.innerHTML=innerData[item][key][ip]['key'];
+              valueTag.innerHTML = innerData[item][key][ip]['value'];
+              entryTag.appendChild(keyTag);
+              entryTag.appendChild(valueTag);
+              childTag.appendChild(entryTag);
             }
             break;
           default:
