@@ -1,0 +1,24 @@
+{
+  "Provider":[
+    {
+      "name":"AWS",
+      "location":["Germany", "US-East", "US-West"]
+    },
+    {
+      "name":"Azure",
+      "location":["Germany", "US-East", "US-West"]
+    },
+    {
+      "name":"Provider1",
+      "location":["Germany", "US-West"]
+    },
+    {
+      "name":"Provider2",
+      "location":["US-East", "US-West"]
+    },
+    {
+      "name":"Provider3",
+      "location":["Germany"]
+    }
+  ]
+}

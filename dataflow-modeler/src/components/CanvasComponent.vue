@@ -25,32 +25,46 @@ eslint-disable
           <p><b>Properties</b></p>
           <button v-if="node!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
           <form class="form-container" style="width: 250px">
-            <span v-if="node!=null">
+            <div v-if="node!=null">
                 <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
-                <label>Name:</label>
+                <label>Name</label>
                 <span>&nbsp;</span>
                 <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
-                <label>Namespace:</label>
-                <span>&nbsp;</span>
-                <select v-model="selectedNamespace" style="max-width: 100%" @change="changeNameSpace">
-                  <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
-                </select>
-                <label>Type:</label>
-                <span>&nbsp;</span>
-                <select v-model="selectedType" style="max-width: 100%" v-if="selectedNamespace!=null">
-                  <option v-for="type in Types" :key="type">{{type}}</option>
-                </select>
-                <label>Provider:</label>
-                <span>&nbsp;</span>
-                <select v-model="selectedProvider" style="max-width: 100%" @change="changeProvider">
-                  <option v-for="provider in options.Provider" :key="provider">{{provider.name}}</option>
-                </select>
-                <label>Location:</label>
-                <span>&nbsp;</span>
-                <select v-model="selectedLocation" style="max-width: 100%" v-if="selectedProvider!=null" >
-                  <option v-for="location in Location" :key="location">{{location}}</option>
-                </select>
-            </span>
+              <table v-if="options!=null && providers!=null">
+                <tr>
+                  <td>Namespace</td>
+                  <td>
+                    <select name="namespace" v-model="node.namespace" style="width: 100%">
+                      <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Type</td>
+                  <td>
+                    <select name="type" v-model="node.type" style="width: 100%">
+                      <option v-for="type in Types" :key="type">{{type}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Provider</td>
+                  <td>
+                    <select name="provider" v-model="node.provider" style="width: 100%">
+                      <option v-for="provider in providers.Provider" :key="provider">{{provider.name}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Location</td>
+                  <td>
+                    <select name="location" v-model="node.location" style="width: 100%">
+                      <option v-for="location in Location" :key="location">{{location}}</option>
+                    </select>
+                  </td>
+                </tr>
+              </table>
+            </div>
             <table id="propTable" style="width: 250px;">
               <thead class="propTable-header" v-if="node!=null">
               <tr>
@@ -104,17 +118,7 @@ export default {
       Location:[],
       selectedLocation:'',
       dataToImport:{"drawflow":{"Home":{"data":{}}}},
-       prop:{'key':'','value':''},
-      option: store.getters.GetOptions
-      // newRow:'<tr><td><input type="text" class="input-field"' +
-      //     ' placeholder="Enter Key" name="key">\n' +
-      //     '                  </td>\n' +
-      //     '                  <td>\n' +
-      //     '                    <input type="text" class="input-field" placeholder="Enter Value" name="value">\n' +
-      //     '                  </td>\n' +
-      //     '                  <td>\n' +
-      //     '                    <button class="btn-propdelete">x</button>\n' +
-      //     '                  </td></tr>'
+      prop:{'key':'','value':''}
     }
   },
   computed:{
@@ -123,6 +127,9 @@ export default {
     },
     options:function(){
       return store.getters.GetOptions;
+    },
+    providers:function(){
+      return store.getters.GetProviders;
     },
     // nodeId:function (){
     //   let node=store.getters.GetNodeProp;
@@ -167,6 +174,7 @@ export default {
       console.log("Node unselected " + id);
       store.commit('SetNodeProp',null);
       $('#propTable > tbody >tr').remove();
+
     })
 
     store.getters.GetEditor.on('moduleCreated', function(name) {
@@ -295,12 +303,24 @@ export default {
       store.getters.GetEditor.addNodeProperties(formData);
     },
     changeNameSpace(){
-      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.selectedNamespace))[0].type;
+      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.node.namespace))[0].type;
     },
     changeProvider(){
-      this.Location= (this.options.Provider.filter((ns)=> ns.name=== this.selectedProvider))[0].location;
+      this.Location= (this.providers.Provider.filter((ps)=> ps.name=== this.node.provider))[0].location;
     }
 
+  },
+  watch:{
+    'node.namespace':function(val){
+      if(val){
+        this.changeNameSpace();
+      }
+    },
+    'node.provider':function(val){
+      if(val){
+        this.changeProvider();
+      }
+    }
   }
 }
 </script>

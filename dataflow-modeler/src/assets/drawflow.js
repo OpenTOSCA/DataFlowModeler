@@ -51,6 +51,7 @@ export default class Drawflow {
     this.evCache = [];
     this.prevDiff = -1;
     this.properties=null;
+
   }
 
   start () {
@@ -221,6 +222,10 @@ export default class Drawflow {
           let index= $.map(this.drawflow.drawflow[this.module].data,Object).findIndex(el=>el.id === parseInt(this.ele_selected.id.slice(5)));
            this.dispatch('nodeSelected',{"nodeId":index+1,
              "name":this.drawflow.drawflow[this.module].data[index+1].name,
+             "namespace":this.drawflow.drawflow[this.module].data[index+1].namespace,
+             "type":this.drawflow.drawflow[this.module].data[index+1].type,
+             "provider":this.drawflow.drawflow[this.module].data[index+1].provider,
+             "location":this.drawflow.drawflow[this.module].data[index+1].location,
              "properties":this.drawflow.drawflow[this.module].data[index+1].properties});
           // const properties = this.ele_selected.getElementsByClassName('properties')[0];
           // this.dispatch('nodeSelected', properties.outerHTML);
@@ -1355,6 +1360,10 @@ export default class Drawflow {
     var json = {
       id: newNodeId,
       name: nodeName,
+      namespace:'',
+      type:'',
+      provider:'',
+      location:'',
       data: data,
       class: classoverride,
       html: html,
@@ -1728,14 +1737,36 @@ export default class Drawflow {
     debugger;
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
     for (let i=0; i<nodeData.length; i++) {
-      if(nodeData[i].name==='nodeName'){
-        this.drawflow.drawflow[this.module].data[nodeId].name=nodeData[i].value;
-        this.drawflow.drawflow[this.module].data[nodeId].html=`<div class="title-box">${nodeData[i].value}</div>`;
+      switch(nodeData[i].name){
+        case 'nodeName':
+          this.drawflow.drawflow[this.module].data[nodeId].name=nodeData[i].value;
+          this.drawflow.drawflow[this.module].data[nodeId].html=`<div class="title-box">${nodeData[i].value}</div>`;
+          break;
+        case 'namespace':
+          this.drawflow.drawflow[this.module].data[nodeId].namespace=nodeData[i].value;
+          break;
+        case 'type':
+          this.drawflow.drawflow[this.module].data[nodeId].type=nodeData[i].value;
+          break;
+        case 'provider':
+          this.drawflow.drawflow[this.module].data[nodeId].provider=nodeData[i].value;
+          break;
+        case 'location':
+          this.drawflow.drawflow[this.module].data[nodeId].location=nodeData[i].value;
+          break;
+        case 'key':
+          console.log(i,nodeData[i].value,nodeData[i+1].value);
+          this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
+          break;
       }
-      else if(nodeData[i].name==='key'){
-        console.log(i,nodeData[i].value,nodeData[i+1].value);
-        this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
-      }
+      // if(nodeData[i].name==='nodeName'){
+      //   this.drawflow.drawflow[this.module].data[nodeId].name=nodeData[i].value;
+      //   this.drawflow.drawflow[this.module].data[nodeId].html=`<div class="title-box">${nodeData[i].value}</div>`;
+      // }
+      // else if(nodeData[i].name==='key'){
+      //   console.log(i,nodeData[i].value,nodeData[i+1].value);
+      //   this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
+      // }
     }
     this.precanvas.innerHTML = "";
     this.load();
@@ -2029,7 +2060,14 @@ export default class Drawflow {
           for(let j=0; j<childNodes.length;j++){
             let subchildNodes=childNodes[j].childNodes;
             let objElements={properties:[]};
+            let typeSplit=(childNodes[j].getAttribute('type'));
+            let lastIndex=typeSplit.lastIndexOf(':');
+            objElements['namespace']=typeSplit.slice(0,lastIndex);
+            objElements['type']=typeSplit.slice(lastIndex+1);
+            objElements['provider']=childNodes[j].getAttribute('provider');
+            objElements['location']=childNodes[j].getAttribute('location');
             for(let k=0;k<subchildNodes.length;k++){
+              debugger;
               switch(subchildNodes[k].nodeName){
                 case 'inputs':
                 case 'outputs':
@@ -2089,6 +2127,9 @@ export default class Drawflow {
       nodeId[parseInt(innerData[item]['id'])]=innerData[item]['name'];
       let subTag = doc.createElement(innerData[item]['class']);
       subTag.setAttribute("id",innerData[item]['name']);
+      subTag.setAttribute("type",innerData[item]['namespace']+':'+innerData[item]['type']);
+      subTag.setAttribute("location",innerData[item]['location']);
+      subTag.setAttribute("provider",innerData[item]['provider']);
       for(let key in innerData[item]){
         let childTag=doc.createElement(key);
         switch(key){
@@ -2151,6 +2192,12 @@ export default class Drawflow {
               entryTag.appendChild(valueTag);
               childTag.appendChild(entryTag);
             }
+            break;
+          case 'namespace':
+          case 'type':
+          case 'provider':
+          case 'location':
+            continue;
             break;
           default:
             childTag.innerHTML =innerData[item][key];

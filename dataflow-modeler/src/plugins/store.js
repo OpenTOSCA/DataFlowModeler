@@ -8,6 +8,7 @@ const store = createStore({
             mobileLastMove:null,
             mobileItemSelect:null,
             options:null,
+            providers:null,
             propertyData:{},
             nodeProperty:null
         }
@@ -48,6 +49,10 @@ const store = createStore({
         SetOptions(state,options){
             state.options=options
         }
+        ,
+        SetProviders(state,providers){
+            state.providers=providers
+        }
 
     },
     getters:{
@@ -65,6 +70,10 @@ const store = createStore({
         },
         GetOptions: function (state){
             return state.options
+        }
+        ,
+        GetProviders: function (state){
+            return state.providers
         }
     }
 })

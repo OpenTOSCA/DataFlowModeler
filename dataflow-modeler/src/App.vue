@@ -31,11 +31,15 @@ export default {
     // MenuComponent
   },
   beforeMount() {
-    axios
-        .get("Options.json")
-        .then(response =>{
-          store.commit("SetOptions",response.data)
-        })
+    axios.all([
+      axios
+          .get("Options.json"),
+      axios
+          .get("Provider.json")
+    ]).then(axios.spread((response1,response2) =>{
+          store.commit("SetOptions",response1.data)
+          store.commit("SetProviders",response2.data)
+        }));
   }
 }
 </script>

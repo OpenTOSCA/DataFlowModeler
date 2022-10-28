@@ -1,0 +1,15 @@
+{
+   "Namespace":[
+   	{
+   		"id":"nt",
+   		"name":"http://plain.winery.opentosca.org/placement/nodetypes",
+   		"type":["DataSource_w1-wip1","DataProcessingComponent_w1-wip1"]
+   	},
+   	{
+   		"id":"st",
+   		"name":"http://plain.winery.opentosca.org/placement/servicetemplates",
+   		"type":["SomeOtherDataSource_w1-wip1","SomeOtherDataProcessingComponent_w1-wip1"]
+   	}
+   ]
+}
+
