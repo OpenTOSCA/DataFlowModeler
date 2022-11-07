@@ -23,13 +23,14 @@ eslint-disable
         </div>
         <div class="drawflow-property">
           <p><b>Properties</b></p>
-          <button v-if="node!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
+          <button v-if="node!=null || pipe!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
           <form class="form-container" style="width: 250px">
             <div v-if="node!=null">
-                <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
-                <label>Name</label>
-                <span>&nbsp;</span>
-                <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
+              <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="nodeform">
+              <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
+              <label>Name</label>
+              <span>&nbsp;</span>
+              <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
               <table v-if="options!=null && providers!=null">
                 <tr>
                   <td>Namespace</td>
@@ -64,6 +65,12 @@ eslint-disable
                   </td>
                 </tr>
               </table>
+            </div>
+            <div v-if="pipe!=null">
+              <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="pipeform">
+              <select name="pipetype" v-model="pipe.type" style="width: 100%">
+                <option v-for="pipeType in pipeTypes" :key="pipeType">{{pipeType}}</option>
+              </select>
             </div>
             <table id="propTable" style="width: 250px;">
               <thead class="propTable-header" v-if="node!=null">
@@ -113,6 +120,7 @@ export default {
       filename: '',
       selectedNamespace:'',
       Types:[],
+      pipeTypes:["push","pull"],
       selectedType:'',
       selectedProvider:'',
       Location:[],
@@ -124,6 +132,9 @@ export default {
   computed:{
     node:function(){
       return store.getters.GetNodeProp;
+    },
+    pipe:function(){
+      return store.getters.GetPipeProp;
     },
     options:function(){
       return store.getters.GetOptions;
@@ -187,6 +198,18 @@ export default {
 
     store.getters.GetEditor.on('connectionCreated', function(connection) {
       console.log('Connection created');
+      console.log(connection);
+    })
+
+    store.getters.GetEditor.on('connectionSelected', function(pipe) {
+      console.log('Connection selected');
+      store.commit('SetPipeProp',pipe);
+      console.log(pipe.type);
+    })
+
+    store.getters.GetEditor.on('connectionUnselected', function(connection) {
+      console.log('Connection unselected');
+      store.commit('SetPipeProp',null);
       console.log(connection);
     })
 
@@ -299,8 +322,10 @@ export default {
     },
     saveProperty() {
       let formData= $('form').serializeArray();
-      //console.log('Id save prop:'+$('#propTable > tbody').data("node"));
-      store.getters.GetEditor.addNodeProperties(formData);
+      if(formData[0].name === "formType" && formData[0].value === "nodeform")
+        store.getters.GetEditor.addNodeProperties(formData);
+      else
+        store.getters.GetEditor.addPipeProperties({'pipe':this.pipe,'data':formData});
     },
     changeNameSpace(){
       this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.node.namespace))[0].type;

@@ -219,16 +219,24 @@ export default class Drawflow {
         }
         if(this.node_selected != this.ele_selected) {
           // console.log(this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
-          let index= $.map(this.drawflow.drawflow[this.module].data,Object).findIndex(el=>el.id === parseInt(this.ele_selected.id.slice(5)));
-           this.dispatch('nodeSelected',{"nodeId":index+1,
-             "name":this.drawflow.drawflow[this.module].data[index+1].name,
-             "namespace":this.drawflow.drawflow[this.module].data[index+1].namespace,
-             "type":this.drawflow.drawflow[this.module].data[index+1].type,
-             "provider":this.drawflow.drawflow[this.module].data[index+1].provider,
-             "location":this.drawflow.drawflow[this.module].data[index+1].location,
-             "properties":this.drawflow.drawflow[this.module].data[index+1].properties});
-          // const properties = this.ele_selected.getElementsByClassName('properties')[0];
-          // this.dispatch('nodeSelected', properties.outerHTML);
+          // let index= $.map(this.drawflow.drawflow[this.module].data,Object).findIndex(el=>el.id === parseInt(this.ele_selected.id.slice(5)));
+          let index= parseInt(this.ele_selected.id.slice(5));
+          debugger;
+           // this.dispatch('nodeSelected',{"nodeId":index+1,
+           //   "name":this.drawflow.drawflow[this.module].data[index+1].name,
+           //   "namespace":this.drawflow.drawflow[this.module].data[index+1].namespace,
+           //   "type":this.drawflow.drawflow[this.module].data[index+1].type,
+           //   "provider":this.drawflow.drawflow[this.module].data[index+1].provider,
+           //   "location":this.drawflow.drawflow[this.module].data[index+1].location,
+           //   "properties":this.drawflow.drawflow[this.module].data[index+1].properties});
+
+          this.dispatch('nodeSelected',{"nodeId":index,
+            "name":this.drawflow.drawflow[this.module].data[index].name,
+            "namespace":this.drawflow.drawflow[this.module].data[index].namespace,
+            "type":this.drawflow.drawflow[this.module].data[index].type,
+            "provider":this.drawflow.drawflow[this.module].data[index].provider,
+            "location":this.drawflow.drawflow[this.module].data[index].location,
+            "properties":this.drawflow.drawflow[this.module].data[index].properties});
         }
         this.node_selected = this.ele_selected;
         this.node_selected.classList.add("selected");
@@ -283,6 +291,7 @@ export default class Drawflow {
         this.editor_selected = true;
         break;
       case 'main-path':
+        debugger;
         if(this.node_selected != null) {
           this.node_selected.classList.remove("selected");
           this.node_selected = null;
@@ -292,11 +301,16 @@ export default class Drawflow {
           this.connection_selected.classList.remove("selected");
           this.removeReouteConnectionSelected();
           this.connection_selected = null;
+          this.dispatch('connectionUnselected', true);
         }
         this.connection_selected = this.ele_selected;
         this.connection_selected.classList.add("selected");
         const listclassConnection = this.connection_selected.parentElement.classList;
-        this.dispatch('connectionSelected', { output_id: listclassConnection[2].slice(14), input_id: listclassConnection[1].slice(13), output_class: listclassConnection[3], input_class: listclassConnection[4] });
+        let connectionDetail = this.drawflow.drawflow[this.module].data[listclassConnection[2].slice(14)].outputs[listclassConnection[3]].connections;
+        debugger;
+        // this.drawflow.drawflow[this.module].data[listclassConnection[1].slice(13)].inputs[listclassConnection[4]].connections.push( {"node": id_output, "input": output_class, "type":null});
+        this.dispatch('connectionSelected',{'output_id': listclassConnection[2].slice(14), 'input_id': listclassConnection[1].slice(13), 'output_class': listclassConnection[3], 'input_class': listclassConnection[4], 'type':connectionDetail[0].type});
+        // this.dispatch('connectionSelected', { pipetype:'push', output_id: listclassConnection[2].slice(14), input_id: listclassConnection[1].slice(13), output_class: listclassConnection[3], input_class: listclassConnection[4] });
         if(this.reroute_fix_curvature) {
           this.connection_selected.parentElement.querySelectorAll(".main-path").forEach((item, i) => {
             item.classList.add("selected");
@@ -503,11 +517,32 @@ export default class Drawflow {
           let id_input = input_id.slice(5);
           let id_output = output_id.slice(5);
 
-          this.drawflow.drawflow[this.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class});
-          this.drawflow.drawflow[this.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class});
+          this.drawflow.drawflow[this.module].data[id_output].outputs[output_class].connections.push( {"node": id_input, "output": input_class, "type":null});
+          this.drawflow.drawflow[this.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class, "type":null});
           this.updateConnectionNodes('node-'+id_output);
           this.updateConnectionNodes('node-'+id_input);
-          this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
+          debugger;
+            // var json = {
+            //   id: newNodeId,
+            //   name: nodeName,
+            //   namespace:'',
+            //   type:'',
+            //   provider:'',
+            //   location:'',
+            //   data: data,
+            //   class: classoverride,
+            //   html: html,
+            //   typenode: typenode,
+            //   inputs: json_inputs,
+            //   outputs: json_outputs,
+            //   properties: [],
+            //   // properties: [],
+            //   pos_x: ele_pos_x,
+            //   pos_y: ele_pos_y,
+            // }
+            // store.commit("SetPropertyData",{'id':json.name});
+            // this.drawflow.drawflow[this.module].data[newNodeId] = json;
+          this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class, 'type':null});
 
         } else {
           this.dispatch('connectionCancel', true);
@@ -756,7 +791,7 @@ export default class Drawflow {
           this.updateConnectionNodes('node-'+id_output);
           this.updateConnectionNodes('node-'+id_input);
         }
-
+        debugger;
         this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
       }
     }
@@ -1733,7 +1768,7 @@ export default class Drawflow {
   }
 
   addNodeProperties(nodeData){
-    let nodeId=nodeData[0].value;
+    let nodeId=nodeData[1].value;
     debugger;
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
     for (let i=0; i<nodeData.length; i++) {
@@ -1790,6 +1825,27 @@ export default class Drawflow {
     // }
     // this.removeNodeId('node-'+nodeId);
   }
+
+  addPipeProperties(pipeData){
+    debugger;
+    console.log(pipeData);
+
+    this.drawflow.drawflow[this.module].data[pipeData.pipe.input_id].inputs[pipeData.pipe.input_class].connections = [];
+    this.drawflow.drawflow[this.module].data[pipeData.pipe.output_id].outputs[pipeData.pipe.output_class].connections = [];
+
+    this.drawflow.drawflow[this.module].data[pipeData.pipe.input_id].inputs[pipeData.pipe.input_class].connections.push({
+          "node": pipeData.pipe.output_id,
+          "input": pipeData.pipe.output_class,
+          "type":pipeData.pipe.type
+        });
+    this.drawflow.drawflow[this.module].data[pipeData.pipe.output_id].outputs[pipeData.pipe.output_class].connections.push({
+      "node": pipeData.pipe.input_id,
+      "output": pipeData.pipe.input_class,
+      "type":pipeData.pipe.type
+    });
+  }
+
+
   removeProperties(){
 
   }
@@ -2050,14 +2106,13 @@ export default class Drawflow {
   convertXmlToJSON(dataXML){
     let dataJson=this.drawflow;
     let data={};
-    let itemCount=1;
     if(dataXML!=null){
       let elements=dataXML.firstChild.childNodes;
       for(let i=0; i<elements.length;i++){
-        debugger;
         if(elements[i].nodeName!="Pipes"){
           let childNodes=elements[i].childNodes;
           for(let j=0; j<childNodes.length;j++){
+            let item_id=0;
             let subchildNodes=childNodes[j].childNodes;
             let objElements={properties:[]};
             let typeSplit=(childNodes[j].getAttribute('type'));
@@ -2067,7 +2122,6 @@ export default class Drawflow {
             objElements['provider']=childNodes[j].getAttribute('provider');
             objElements['location']=childNodes[j].getAttribute('location');
             for(let k=0;k<subchildNodes.length;k++){
-              debugger;
               switch(subchildNodes[k].nodeName){
                 case 'inputs':
                 case 'outputs':
@@ -2091,7 +2145,11 @@ export default class Drawflow {
                   break;
                 case 'pos_x':
                 case 'pos_y':
+                  objElements[subchildNodes[k].nodeName]= parseInt(subchildNodes[k].innerHTML);
+                  break;
                 case 'id':
+                  debugger;
+                  item_id= parseInt(subchildNodes[k].innerHTML);
                   objElements[subchildNodes[k].nodeName]= parseInt(subchildNodes[k].innerHTML);
                   break;
                 default:
@@ -2099,11 +2157,12 @@ export default class Drawflow {
               }
 
             }
-            data[itemCount]=objElements;
-            itemCount++;
+            debugger;
+            data[item_id]=objElements;
           }
         }
       }
+
       dataJson['drawflow']['Home']['data']=data;
       debugger;
     }
@@ -2156,7 +2215,7 @@ export default class Drawflow {
                 let found= pipeData.some(el=>(el.source=== parseInt(inConnection[key]['node']) && el.target === parseInt(innerData[item]['id'])));
                 if(!found){
                   pipeCount+=1;
-                  pipeData.push({'id':pipeCount,'source':parseInt(inConnection[key]['node']),'target':parseInt(innerData[item]['id'])});
+                  pipeData.push({'id':pipeCount,'source':parseInt(inConnection[key]['node']),'target':parseInt(innerData[item]['id']), 'type': inConnection[key]['type']});
                 }
               }
             }
@@ -2172,7 +2231,7 @@ export default class Drawflow {
                 let found= pipeData.some(el=>(el.source===parseInt(innerData[item]['id']) && el.target===parseInt(outConnection[key]['node'])));
                 if(!found){
                   pipeCount+=1;
-                  pipeData.push({'id':pipeCount,'source':parseInt(innerData[item]['id']),'target':parseInt(outConnection[key]['node'])});
+                  pipeData.push({'id':pipeCount,'source':parseInt(innerData[item]['id']),'target':parseInt(outConnection[key]['node']),'type': outConnection[key]['type']});
                 }
               }
             }
@@ -2223,6 +2282,7 @@ export default class Drawflow {
       let sourceTag=doc.createElement("Source");
       let targetTag=doc.createElement("Target");
       innerPipeTag.setAttribute('id','Pipe'+pipe.id);
+      innerPipeTag.setAttribute('dataTransferType', pipe.type);
       sourceTag.innerHTML=nodeId[pipe.source];
       targetTag.innerHTML=nodeId[pipe.target];
       innerPipeTag.appendChild(sourceTag);

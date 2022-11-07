@@ -10,7 +10,8 @@ const store = createStore({
             options:null,
             providers:null,
             propertyData:{},
-            nodeProperty:null
+            nodeProperty:null,
+            pipeProperty:null
         }
     },
     mutations: {
@@ -46,6 +47,10 @@ const store = createStore({
             state.nodeProperty=node
         }
         ,
+        SetPipeProp(state,pipe){
+            state.pipeProperty=pipe
+        }
+        ,
         SetOptions(state,options){
             state.options=options
         }
@@ -67,7 +72,12 @@ const store = createStore({
         },
         GetNodeProp: function (state){
             return state.nodeProperty
-        },
+        }
+        ,
+        GetPipeProp: function (state){
+            return state.pipeProperty
+        }
+        ,
         GetOptions: function (state){
             return state.options
         }
