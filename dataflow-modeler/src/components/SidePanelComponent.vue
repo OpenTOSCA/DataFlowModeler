@@ -16,7 +16,6 @@
 </template>
 
 <script>
-//import Drawflow from "@/assets/drawflow";
 import FlowEvents from "@/assets/flowevents";
 export default {
   name: "SidePanelComponent",
@@ -33,32 +32,6 @@ export default {
       elements[i].addEventListener('touchmove', this.flowEvents.positionMobile, false);
       elements[i].addEventListener('touchstart', this.flowEvents.drag, false );
     }
-  },
-  methods:{
-    // positionMobile(ev) {
-    //   this.mobileLastMove = ev;
-    //   },
-    // drag(ev) {
-    //   if (ev.type === "touchstart") {
-    //     this.mobileItemSelect = ev.target.closest(".drag-drawflow").getAttribute('data-node');
-    //   } else {
-    //     ev.dataTransfer.setData("node", ev.target.getAttribute('data-node'));
-    //   }
-    // },
-    // drop(ev) {
-    //   if (ev.type === "touchend") {
-    //     var parentdrawflow = document.elementFromPoint( mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY).closest("#drawflow");
-    //     if(parentdrawflow != null) {
-    //       addNodeToDrawFlow(this.mobileItemSelect, mobile_last_move.touches[0].clientX, mobile_last_move.touches[0].clientY);
-    //     }
-    //     this.mobileItemSelect = '';
-    //   } else {
-    //     ev.preventDefault();
-    //     var data = ev.dataTransfer.getData("node");
-    //     addNodeToDrawFlow(data, ev.clientX, ev.clientY);
-    //   }
-    //
-    // }
   }
 }
 </script>

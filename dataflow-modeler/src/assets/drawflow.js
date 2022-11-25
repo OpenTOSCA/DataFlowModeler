@@ -218,17 +218,7 @@ export default class Drawflow {
           this.connection_selected = null;
         }
         if(this.node_selected != this.ele_selected) {
-          // console.log(this.drawflow.drawflow[this.module].data[this.ele_selected.id.slice(5)].properties);
-          // let index= $.map(this.drawflow.drawflow[this.module].data,Object).findIndex(el=>el.id === parseInt(this.ele_selected.id.slice(5)));
           let index= parseInt(this.ele_selected.id.slice(5));
-          debugger;
-           // this.dispatch('nodeSelected',{"nodeId":index+1,
-           //   "name":this.drawflow.drawflow[this.module].data[index+1].name,
-           //   "namespace":this.drawflow.drawflow[this.module].data[index+1].namespace,
-           //   "type":this.drawflow.drawflow[this.module].data[index+1].type,
-           //   "provider":this.drawflow.drawflow[this.module].data[index+1].provider,
-           //   "location":this.drawflow.drawflow[this.module].data[index+1].location,
-           //   "properties":this.drawflow.drawflow[this.module].data[index+1].properties});
 
           this.dispatch('nodeSelected',{"nodeId":index,
             "name":this.drawflow.drawflow[this.module].data[index].name,
@@ -307,10 +297,7 @@ export default class Drawflow {
         this.connection_selected.classList.add("selected");
         const listclassConnection = this.connection_selected.parentElement.classList;
         let connectionDetail = this.drawflow.drawflow[this.module].data[listclassConnection[2].slice(14)].outputs[listclassConnection[3]].connections;
-        debugger;
-        // this.drawflow.drawflow[this.module].data[listclassConnection[1].slice(13)].inputs[listclassConnection[4]].connections.push( {"node": id_output, "input": output_class, "type":null});
         this.dispatch('connectionSelected',{'output_id': listclassConnection[2].slice(14), 'input_id': listclassConnection[1].slice(13), 'output_class': listclassConnection[3], 'input_class': listclassConnection[4], 'type':connectionDetail[0].type});
-        // this.dispatch('connectionSelected', { pipetype:'push', output_id: listclassConnection[2].slice(14), input_id: listclassConnection[1].slice(13), output_class: listclassConnection[3], input_class: listclassConnection[4] });
         if(this.reroute_fix_curvature) {
           this.connection_selected.parentElement.querySelectorAll(".main-path").forEach((item, i) => {
             item.classList.add("selected");
@@ -521,27 +508,6 @@ export default class Drawflow {
           this.drawflow.drawflow[this.module].data[id_input].inputs[input_class].connections.push( {"node": id_output, "input": output_class, "type":null});
           this.updateConnectionNodes('node-'+id_output);
           this.updateConnectionNodes('node-'+id_input);
-          debugger;
-            // var json = {
-            //   id: newNodeId,
-            //   name: nodeName,
-            //   namespace:'',
-            //   type:'',
-            //   provider:'',
-            //   location:'',
-            //   data: data,
-            //   class: classoverride,
-            //   html: html,
-            //   typenode: typenode,
-            //   inputs: json_inputs,
-            //   outputs: json_outputs,
-            //   properties: [],
-            //   // properties: [],
-            //   pos_x: ele_pos_x,
-            //   pos_y: ele_pos_y,
-            // }
-            // store.commit("SetPropertyData",{'id':json.name});
-            // this.drawflow.drawflow[this.module].data[newNodeId] = json;
           this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class, 'type':null});
 
         } else {
@@ -665,6 +631,7 @@ export default class Drawflow {
     }
   }
 
+
   createCurvature(start_pos_x, start_pos_y, end_pos_x, end_pos_y, curvature_value, type) {
     let line_x = start_pos_x;
     let line_y = start_pos_y;
@@ -672,6 +639,7 @@ export default class Drawflow {
     let hx2=null;
     let x = end_pos_x;
     let y = end_pos_y;
+    var center_x = ((end_pos_x - start_pos_x)/2)+start_pos_x;
     let curvature = curvature_value;
     //type openclose open close other
     switch (type) {
@@ -713,7 +681,11 @@ export default class Drawflow {
 
         //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
     }
-    return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
+    // return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
+
+    return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
+    // return ' M '+ line_x +' '+ line_y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
+    // return ' M ' + start_pos_x + ' ' + start_pos_y + ' L '+ center_x +' ' +  start_pos_y  + ' L ' + center_x + ' ' +  end_pos_y  + ' L ' + end_pos_x + ' ' + end_pos_y;
 
   }
 
@@ -724,7 +696,6 @@ export default class Drawflow {
     let path = document.createElementNS('http://www.w3.org/2000/svg',"path");
     path.classList.add("main-path");
     path.setAttributeNS(null, 'd', '');
-    // path.innerHTML = 'a';
     connection.classList.add("connection");
     connection.appendChild(path);
     this.precanvas.appendChild(connection);
@@ -755,47 +726,47 @@ export default class Drawflow {
 
   }
 
-  addConnection(id_output, id_input, output_class, input_class) {
-    let nodeOneModule = this.getModuleFromNodeId(id_output);
-    let nodeTwoModule = this.getModuleFromNodeId(id_input);
-    if(nodeOneModule === nodeTwoModule) {
-
-      let dataNode = this.getNodeFromId(id_output);
-      let exist = false;
-      for(let checkOutput in dataNode.outputs[output_class].connections){
-        let connectionSearch = dataNode.outputs[output_class].connections[checkOutput]
-        if(connectionSearch.node == id_input && connectionSearch.output == input_class) {
-            exist = true;
-        }
-      }
-      // Check connection exist
-      if(exist === false) {
-        //Create Connection
-        this.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class});
-        this.drawflow.drawflow[nodeOneModule].data[id_input].inputs[input_class].connections.push( {"node": id_output.toString(), "input": output_class});
-
-        if(this.module === nodeOneModule) {
-        //Draw connection
-          let connection = document.createElementNS('http://www.w3.org/2000/svg',"svg");
-          let path = document.createElementNS('http://www.w3.org/2000/svg',"path");
-          path.classList.add("main-path");
-          path.setAttributeNS(null, 'd', '');
-          // path.innerHTML = 'a';
-          connection.classList.add("connection");
-          connection.classList.add("node_in_node-"+id_input);
-          connection.classList.add("node_out_node-"+id_output);
-          connection.classList.add(output_class);
-          connection.classList.add(input_class);
-          connection.appendChild(path);
-          this.precanvas.appendChild(connection);
-          this.updateConnectionNodes('node-'+id_output);
-          this.updateConnectionNodes('node-'+id_input);
-        }
-        debugger;
-        this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
-      }
-    }
-  }
+  // addConnection(id_output, id_input, output_class, input_class) {
+  //   let nodeOneModule = this.getModuleFromNodeId(id_output);
+  //   let nodeTwoModule = this.getModuleFromNodeId(id_input);
+  //   if(nodeOneModule === nodeTwoModule) {
+  //
+  //     let dataNode = this.getNodeFromId(id_output);
+  //     let exist = false;
+  //     for(let checkOutput in dataNode.outputs[output_class].connections){
+  //       let connectionSearch = dataNode.outputs[output_class].connections[checkOutput]
+  //       if(connectionSearch.node == id_input && connectionSearch.output == input_class) {
+  //           exist = true;
+  //       }
+  //     }
+  //     // Check connection exist
+  //     if(exist === false) {
+  //       //Create Connection
+  //       this.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class});
+  //       this.drawflow.drawflow[nodeOneModule].data[id_input].inputs[input_class].connections.push( {"node": id_output.toString(), "input": output_class});
+  //
+  //       if(this.module === nodeOneModule) {
+  //       //Draw connection
+  //         let connection = document.createElementNS('http://www.w3.org/2000/svg',"svg");
+  //         let path = document.createElementNS('http://www.w3.org/2000/svg',"path");
+  //         path.classList.add("main-path");
+  //         path.setAttributeNS(null, 'd', '');
+  //         // path.innerHTML = 'a';
+  //         connection.classList.add("connection");
+  //         connection.classList.add("node_in_node-"+id_input);
+  //         connection.classList.add("node_out_node-"+id_output);
+  //         connection.classList.add(output_class);
+  //         connection.classList.add(input_class);
+  //         connection.appendChild(path);
+  //         this.precanvas.appendChild(connection);
+  //         this.updateConnectionNodes('node-'+id_output);
+  //         this.updateConnectionNodes('node-'+id_input);
+  //       }
+  //       debugger;
+  //       this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
+  //     }
+  //   }
+  // }
 
   updateConnectionNodes(id) {
 
@@ -1290,9 +1261,6 @@ export default class Drawflow {
     const outputs = document.createElement('div');
     outputs.classList.add("outputs");
 
-    // const properties = document.createElement('div');
-    // properties.classList.add("properties");
-
     const json_inputs = {}
     for(var x = 0; x < num_in; x++) {
       const input = document.createElement('div');
@@ -1311,20 +1279,9 @@ export default class Drawflow {
       outputs.appendChild(output);
     }
 
-    // for(var x = 0; x < num_out; x++) {
-    //   const property = document.createElement('div');
-    //   property.classList.add("property");
-    //   const propertyvalue = document.createElement('div');
-    //   store.commit("SetPropertyData",{'id':html+'_'+newNodeId,'key':'test1','value':'value'})
-    //   store.commit("SetPropertyData",{'id':html+'_'+newNodeId,'key':'test2','value':'value'})
-    //   store.commit("RemovePropertyData",{'id':html+'_'+newNodeId,'key':'test1'});
-    //   json_properties["property_"+(x+1)] = { "property": []};
-    //   properties.appendChild(property);
-    // }
-
     const content = document.createElement('div');
     content.classList.add("drawflow_content_node");
-    html=`<div class="title-box">${html} ${newNodeId}</div>`;
+    html=`<div class="title-box">${html}</div>`;
     if(typenode === false) {
       content.innerHTML = html;
     } else if (typenode === true) {
@@ -1391,10 +1348,9 @@ export default class Drawflow {
     node.style.left = ele_pos_x + "px";
     parent.appendChild(node);
     this.precanvas.appendChild(parent);
-    let nodeName=name+' '+newNodeId;
     var json = {
       id: newNodeId,
-      name: nodeName,
+      name: name,
       namespace:'',
       type:'',
       provider:'',
@@ -1406,10 +1362,13 @@ export default class Drawflow {
       inputs: json_inputs,
       outputs: json_outputs,
       properties: [],
-      // properties: [],
       pos_x: ele_pos_x,
       pos_y: ele_pos_y,
     }
+    if(json.class === 'input')
+      json.properties.push({'key':'data size','value':''});
+    else if (json.class === 'filter')
+      json.properties.push({'key':'data factor','value':''});
     store.commit("SetPropertyData",{'id':json.name});
     this.drawflow.drawflow[this.module].data[newNodeId] = json;
     this.dispatch('nodeCreated', newNodeId);
@@ -1794,36 +1753,9 @@ export default class Drawflow {
           this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
           break;
       }
-      // if(nodeData[i].name==='nodeName'){
-      //   this.drawflow.drawflow[this.module].data[nodeId].name=nodeData[i].value;
-      //   this.drawflow.drawflow[this.module].data[nodeId].html=`<div class="title-box">${nodeData[i].value}</div>`;
-      // }
-      // else if(nodeData[i].name==='key'){
-      //   console.log(i,nodeData[i].value,nodeData[i+1].value);
-      //   this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':nodeData[i].value,'value':nodeData[i+1].value});
-      // }
     }
     this.precanvas.innerHTML = "";
     this.load();
-    // $(nodeData).each(function(i, field){
-    //   if(field.name==='nodeName'){
-    //
-    //   }
-    //   else if(field.name==='key'){
-    //     console.log(i,field.value,nodeData[i+1].value);
-    //     debugger;
-    //     this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':field.value,'value':nodeData[i+1].value});
-    //   }
-    // });
-    // if(property=='key'){
-    //   if(!(prop.hasOwnProperty(value))){
-    //     this.drawflow.drawflow[this.module].data[nodeId].properties.push({'key':value,'value':''});
-    //   }
-    // }
-    // else{
-    //
-    // }
-    // this.removeNodeId('node-'+nodeId);
   }
 
   addPipeProperties(pipeData){
@@ -1846,9 +1778,6 @@ export default class Drawflow {
   }
 
 
-  removeProperties(){
-
-  }
   removeNodeOutput(id, output_class) {
     var moduleName = this.getModuleFromNodeId(id)
     const infoNode = this.getNodeFromId(id)
@@ -2192,20 +2121,6 @@ export default class Drawflow {
       for(let key in innerData[item]){
         let childTag=doc.createElement(key);
         switch(key){
-          // case 'inputs':
-          // case 'outputs':
-          //   if(Object.keys(innerData[item][key]).length>0){
-          //     for(let ip in innerData[item][key]){
-          //       let subChildTag=doc.createElement(ip);
-          //       subChildTag.innerHTML = JSON.stringify(innerData[item][key][ip]);
-          //       childTag.appendChild(subChildTag);
-          //     }
-          //   }
-          //   else{
-          //     debugger;
-          //     childTag.innerHTML=JSON.stringify({});
-          //   }
-          //   break;
           case 'inputs':
             if(Object.keys(innerData[item][key]).length){
               debugger;

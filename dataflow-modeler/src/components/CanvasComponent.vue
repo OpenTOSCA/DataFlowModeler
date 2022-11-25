@@ -1,4 +1,3 @@
-eslint-disable
 <template>
     <div class="col-right">
       <div class="menuClass">
@@ -11,91 +10,17 @@ eslint-disable
       <div class="col-right-sub">
         <div id="drawflow" v-on:drop="flowEvents.drop" v-on:dragover="flowEvents.allowDrop">
           <div class="btn-clear" v-on:click="$store.getters.GetEditor.clearModuleSelected()">Clear</div>
-<!--          <div class="btn-lock">-->
-<!--            <i id="lock" class="fas fa-lock" v-on:click="changeMode('lock');"></i>-->
-<!--            <i id="unlock" class="fas fa-lock-open" v-on:click="changeMode('unlock');" style="display:none;"></i>-->
-<!--          </div>-->
-<!--          <div class="bar-zoom">-->
-<!--            <i class="fas fa-search-minus" v-on:click="$store.getters.GetEditor.zoom_out()"></i>-->
-<!--            <i class="fas fa-search" v-on:click="$store.getters.GetEditor.zoom_reset()"></i>-->
-<!--            <i class="fas fa-search-plus" v-on:click="$store.getters.GetEditor.zoom_in()"></i>-->
-<!--          </div>-->
+          <div class="btn-lock" v-on:click="changeMode">
+            <div v-if="lock_state"><i id="lock" class="fas fa-lock"></i></div>
+            <div v-else><i id="unlock" class="fas fa-lock-open"></i></div>
+          </div>
+          <div class="bar-zoom">
+            <div @click="$store.getters.GetEditor.zoom_out()"><i class="fas fa-search-minus"></i></div>
+            <div @click="$store.getters.GetEditor.zoom_reset()" style="padding: 0 5px 0 5px"><i class="fas fa-search"></i></div>
+            <div @click="$store.getters.GetEditor.zoom_in()"><i class="fas fa-search-plus"></i></div>
+          </div>
         </div>
-        <div class="drawflow-property">
-          <p><b>Properties</b></p>
-          <button v-if="node!=null || pipe!=null" v-on:click="saveProperty" class="btn-save" style="padding:10px; margin-bottom: 5px;text-align: right">Save</button>
-          <form class="form-container" style="width: 250px">
-            <div v-if="node!=null">
-              <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="nodeform">
-              <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
-              <label>Name</label>
-              <span>&nbsp;</span>
-              <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
-              <table v-if="options!=null && providers!=null">
-                <tr>
-                  <td>Namespace</td>
-                  <td>
-                    <select name="namespace" v-model="node.namespace" style="width: 100%">
-                      <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
-                    </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Type</td>
-                  <td>
-                    <select name="type" v-model="node.type" style="width: 100%">
-                      <option v-for="type in Types" :key="type">{{type}}</option>
-                    </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Provider</td>
-                  <td>
-                    <select name="provider" v-model="node.provider" style="width: 100%">
-                      <option v-for="provider in providers.Provider" :key="provider">{{provider.name}}</option>
-                    </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Location</td>
-                  <td>
-                    <select name="location" v-model="node.location" style="width: 100%">
-                      <option v-for="location in Location" :key="location">{{location}}</option>
-                    </select>
-                  </td>
-                </tr>
-              </table>
-            </div>
-            <div v-if="pipe!=null">
-              <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="pipeform">
-              <select name="pipetype" v-model="pipe.type" style="width: 100%">
-                <option v-for="pipeType in pipeTypes" :key="pipeType">{{pipeType}}</option>
-              </select>
-            </div>
-            <table id="propTable" style="width: 250px;">
-              <thead class="propTable-header" v-if="node!=null">
-              <tr>
-                <th>
-                  <label><b>Key</b></label>
-                </th>
-                <th>
-                  <label><b>Value</b></label>
-                </th>
-              </tr>
-              </thead>
-              <tbody class="propTable-body" :data-node="node.nodeId" v-if="node!=null">
-              <template v-for="prop in node.properties" :key="prop">
-                <tr :name="prop.key">
-                  <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" @change="updateRow"></td>
-                  <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" @change="updateRow"></td>
-                  <td><button class="btn-propdelete" @click="deleteRow">x</button></td>
-                </tr>
-              </template>
-              </tbody>
-            </table>
-          </form>
-          <button class="btn-prop" @click="addRow" style="width:50%;" v-if="node!=null">+</button>
-        </div>
+        <property-component></property-component>
       </div>
     </div>
 </template>
@@ -106,60 +31,26 @@ import store from "@/plugins/store";
 import FlowEvents from "@/assets/flowevents";
 import Helper from "@/assets/helper";
 import $ from 'jquery';
+import PropertyComponent from "@/components/PropertyComponent";
 
 export default {
   name: "CanvasComponent",
+  components: {PropertyComponent},
   data() {
     return{
       flowEvents: new FlowEvents(),
       helper:new Helper(),
       drawflow: new Drawflow(),
+      lock_state:false,
       editor:null,
       mobileItemSelect : '',
       mobileLastMove : null,
       filename: '',
-      selectedNamespace:'',
-      Types:[],
-      pipeTypes:["push","pull"],
-      selectedType:'',
-      selectedProvider:'',
-      Location:[],
-      selectedLocation:'',
       dataToImport:{"drawflow":{"Home":{"data":{}}}},
-      prop:{'key':'','value':''}
     }
-  },
-  computed:{
-    node:function(){
-      return store.getters.GetNodeProp;
-    },
-    pipe:function(){
-      return store.getters.GetPipeProp;
-    },
-    options:function(){
-      return store.getters.GetOptions;
-    },
-    providers:function(){
-      return store.getters.GetProviders;
-    },
-    // nodeId:function (){
-    //   let node=store.getters.GetNodeProp;
-    //   if(node!=null){
-    //     return store.getters.GetNodeProp['nodeId'];
-    //   }
-    //   else{
-    //     return null;
-    //   }
-    //
-    // },
-    // nodeProperty:function(){
-    //   console.log("prop",store.getters.GetNodeProp['properties']);
-    //   return store.getters.GetNodeProp['properties'];
-    // }
   },
   mounted() {
     this.id = document.getElementById("drawflow")
-    //store.getters.GetEditor= new Drawflow(this.id)
     store.commit('SetEditor',new Drawflow(this.id))
     store.getters.GetEditor.reroute = true;
     store.getters.GetEditor.reroute_fix_curvature = true;
@@ -217,11 +108,6 @@ export default {
       console.log('Connection removed');
       console.log(connection);
     })
-    /*
-        editor.on('mouseMove', function(position) {
-          console.log('Position mouse x:' + position.x + ' y:'+ position.y);
-        })
-    */
     store.getters.GetEditor.on('nodeMoved', function(id) {
       console.log("Node moved " + id);
     })
@@ -242,6 +128,30 @@ export default {
       console.log("Reroute removed " + id);
     })
 
+    /* Fix vertical lines */
+
+     /* eslint-disable */
+
+    // store.getters.GetEditor.curvature = 0;
+    // store.getters.GetEditor.reroute_curvature_start_end = 0;
+    // store.getters.GetEditor.reroute_curvature = 0;
+    //
+    // store.getters.GetEditor.createCurvature = function(start_pos_x, start_pos_y, end_pos_x, end_pos_y, curvature_value) {
+    //   let line_x = start_pos_x;
+    //   let line_y = start_pos_y;
+    //   let hx1=null;
+    //   let hx2=null;
+    //   let x = end_pos_x;
+    //   let y = end_pos_y;
+    //   var center_x = ((end_pos_x - start_pos_x)/2)+start_pos_x;
+    //   return ' M '+ line_x +' '+ line_y + ' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
+    //   return ' M ' + start_pos_x + ' ' + start_pos_y + ' L '+ center_x +' ' +  start_pos_y  + ' L ' + center_x + ' ' +  end_pos_y  + ' L ' + end_pos_x + ' ' + end_pos_y;
+    // }
+
+     /* eslint-disable */
+
+    /* End Fix vertical lines */
+
     let elements = document.getElementsByClassName('drag-drawflow');
     for (let i = 0; i < elements.length; i++) {
       elements[i].addEventListener('touchend', this.flowEvents.drop, false);
@@ -258,21 +168,6 @@ export default {
       store.getters.GetEditor.import(dataToImport);
     }
 
-    // $('.propTable-body').on('click', '.btn-propdelete', function(e){
-    //   e.target.closest("tr").remove();
-    // });
-
-    // $('.propTable-body').on('blur','.input-field',function (){
-    //   // let element=e.target.closest("input[name='value']");
-    //   console.log("node id:",$('#propTable > tbody').data("node"));
-    //   console.log($(this).closest('input[name="value"]').attr('name'));
-    //   store.getters.GetEditor.addProperties($('#propTable > tbody').data("node"),$(this).attr('name'),$(this).val());
-    //   // store.getters.GetEditor.updateNodeProperty(e,{'key':e.target.value});
-    //   // alert(e.target.innerText);
-    // });
-
-
-
   },
   methods: {
     selectFile(){
@@ -280,17 +175,13 @@ export default {
       file.click();
 
     },
-    changeMode(option) {
-      console.log(option);
-      let lock=document.getElementById("lock")
-      let unlock=document.getElementById("unlock")
-      console.log(lock,unlock)
-      if(option == 'lock') {
-        lock.style.display = 'none';
-        unlock.style.display = 'block';
+    changeMode() {
+      if(this.lock_state) {
+        this.lock_state = false;
+        store.getters.GetEditor.editor_mode = 'edit';
       } else {
-        lock.style.display = 'block';
-        unlock.style.display = 'none';
+        this.lock_state = true;
+        store.getters.GetEditor.editor_mode = 'fixed';
       }
     },
     ExportData(data){
@@ -304,46 +195,6 @@ export default {
       }
       else{
         alert("Please enter the file name !!")
-      }
-    },
-    addRow(){
-      //$('#propTable > tbody').append(this.newRow);
-      console.log(this.node.properties[this.node.properties.length-1]);
-      this.node.properties.push(this.prop);
-
-    },
-    updateRow(event){
-      let key=event.target.closest("tr").cells[0].children[0].value;
-      let value=event.target.closest("tr").cells[1].children[0].value;
-      this.node.properties[this.node.properties.length-1]={'key':key,'value':value};
-    },
-    deleteRow(event){
-      event.target.closest("tr").remove();
-    },
-    saveProperty() {
-      let formData= $('form').serializeArray();
-      if(formData[0].name === "formType" && formData[0].value === "nodeform")
-        store.getters.GetEditor.addNodeProperties(formData);
-      else
-        store.getters.GetEditor.addPipeProperties({'pipe':this.pipe,'data':formData});
-    },
-    changeNameSpace(){
-      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.node.namespace))[0].type;
-    },
-    changeProvider(){
-      this.Location= (this.providers.Provider.filter((ps)=> ps.name=== this.node.provider))[0].location;
-    }
-
-  },
-  watch:{
-    'node.namespace':function(val){
-      if(val){
-        this.changeNameSpace();
-      }
-    },
-    'node.provider':function(val){
-      if(val){
-        this.changeProvider();
       }
     }
   }

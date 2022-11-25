@@ -5,6 +5,10 @@
   --background-box-title: #f7f7f7;
 }
 
+.fas{
+  pointer-events: all;
+}
+
 html, body {
   margin: 0px;
   padding: 0px;
@@ -58,7 +62,6 @@ header a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /*justify-content: space-between;*/
 }
 
 .col .toolbox{
@@ -72,7 +75,6 @@ header a {
 
 .drag-drawflow {
   line-height: 50px;
-  /*border-bottom: 1px solid var(--border-color);*/
   padding: 20px;
   cursor: move;
   user-select: none;
@@ -113,28 +115,13 @@ cursor: pointer;
 .menu ul li.selected {
   font-weight: bold;
 }
-.text-filepath{
-  /*top: 10px;*/
-  /*right: 10px;*/
-  /*padding: 5px 10px;*/
-  /*border-radius: 4px;*/
-  /*z-index: 5;*/
-}
 
 .btn-export {
-  /*float:right ;*/
-  /*position: absolute;*/
-  /*top: 10px;*/
-  /*right: 10px;*/
-  /*width: 40px;*/
   color: white;
   font-weight: bold;
   border: 1px solid #0e5ba3;
   background: #4ea9ff;
-  /*padding: 5px 10px;*/
-  /*border-radius: 4px;*/
   cursor: pointer;
-  /*z-index: 5;*/
 }
 .menuClass  *{
   display: inline-block;
@@ -147,19 +134,22 @@ cursor: pointer;
 }
 
 .btn-save {
-  /*float:left ;*/
-  /*position: absolute;*/
-  /*top: 10px;*/
-  /*right: 10px;*/
-  /*width: 40px;*/
   color: white;
   font-weight: bold;
   border: 1px solid #0e5ba3;
   background: #4ea9ff;
-  /*padding: 5px 10px;*/
-  /*border-radius: 4px;*/
   cursor: pointer;
-  /*z-index: 5;*/
+}
+
+.btn-save-prop{
+  color: white;
+  font-weight: bold;
+  border: 1px solid #0e5ba3;
+  background: #4ea9ff;
+  padding:10px;
+  margin-bottom: 5px;
+  text-align: right;
+  cursor: pointer;
 }
 
 .btn-clear {
@@ -211,11 +201,11 @@ cursor: pointer;
   border-right: 1px solid var(--border-color);
   z-index: 5;
 }
-.bar-zoom svg {
+.bar-zoom > div > svg {
   cursor: pointer;
   padding-left: 10px;
 }
-.bar-zoom svg:nth-child(1) {
+.bar-zoom > div > svg:nth-child(1) {
   padding-left: 0px;
 }
 
@@ -223,7 +213,6 @@ cursor: pointer;
   position: relative;
   width: calc(100vw - 401px);
   height: calc(100% - 50px);
-  /*top: 40px;*/
   background: var(--background-color);
   background-size: 25px 25px;
   background-image:
@@ -278,7 +267,6 @@ cursor: pointer;
 .drawflow .filter{
   height: 80px;
   width: 160px;
-  /*background-color: #555;*/
   text-align: center;
 }
 
@@ -291,7 +279,6 @@ cursor: pointer;
 
 .drawflow .drawflow-node.selected .title-box {
   color: #22598c;
-  /*border-bottom: 1px solid #4ea9ff;*/
 }
 
 .drawflow .connection .main-path {
@@ -337,9 +324,6 @@ cursor: pointer;
 .drawflow-node .title-box {
   height: 50px;
   line-height: 50px;
-  /*background: var(--background-box-title);*/
-  /*border-bottom: 1px solid #e9e9e9;*/
-  /*border-radius: 4px 4px 0px 0px;*/
   padding-left: 10px;
 }
 .drawflow .title-box svg {
@@ -449,7 +433,6 @@ cursor: pointer;
 .circle {
   height: 60px;
   width: 60px;
-  /*background-color: white;*/
   border-radius: 50%;
   border: 1px solid black;
   text-align: center;
@@ -460,38 +443,11 @@ cursor: pointer;
 .rectangle {
   height: 40px;
   width: 100px;
-  /*background-color: #555;*/
   border: 1px solid black;
   text-align: center;
   -webkit-box-shadow: 0 2px 15px 2px var(--border-color);
   box-shadow: 0 2px 15px 2px var(--border-color);
 }
-
-/*.toolbox *{*/
-/*  !*background: var(--background-color);*!*/
-/*  !*border: 1px solid black;*!*/
-/*  -webkit-box-shadow: 0 2px 15px 2px var(--border-color);*/
-/*  box-shadow: 0 2px 15px 2px var(--border-color);*/
-/*}*/
-
-
-/*.col-prop {*/
-/*  overflow: auto;*/
-/*  width: 200px;*/
-/*  height: 100%;*/
-/*  border-right: 1px solid var(--border-color);*/
-/*  !*justify-content: space-between;*!*/
-/*}*/
-
-
-/*.form-popup {*/
-/*  display: block;*/
-/*  position: fixed;*/
-/*  bottom: 0;*/
-/*  right: 15px;*/
-/*  border: 3px solid #f1f1f1;*/
-/*  z-index: 9;*/
-/*}*/
 
 .drawflow-property{
   border: 1px solid black;
@@ -505,15 +461,11 @@ cursor: pointer;
   background-color: green;
 }
 
-.drawflow-property > *{
-
-}
 
 /* Full-width input fields */
 .form-container input[type=text]{
   width: 70%;
   padding: 10px;
-  /*margin: 5px 0 22px 0;*/
   border: none;
   background: #f1f1f1;
 }

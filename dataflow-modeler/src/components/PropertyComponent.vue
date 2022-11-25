@@ -1,24 +1,167 @@
 <template>
   <div class="col-prop">
-<!--    <div id="drawflow-property" style="float: right;position: absolute;top:10px;right: 10px">-->
-<!--      <form action="/action_page.php" class="form-container">-->
-<!--        <p><b>Properties</b></p>-->
-
-<!--        <label><b>Email</b></label>-->
-<!--        <input type="text" placeholder="Enter Email" name="email" required>-->
-
-<!--        <label><b>Password</b></label>-->
-<!--        <input type="text" placeholder="Enter Password" name="psw" required>-->
-
-<!--        <button type="submit" class="btn">Login</button>-->
-<!--      </form>-->
-<!--    </div>-->
+    <div class="drawflow-property" style="overflow: scroll;height: 100%">
+      <p><b>Properties</b></p>
+      <button class="btn-save-prop" v-if="node!=null || pipe!=null" v-on:click="saveProperty">Save</button>
+      <form class="form-container" style="width: 250px">
+        <div v-if="node!=null">
+          <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="nodeform">
+          <input type="hidden" class="input-name" placeholder="Enter name" name="nodeId" :value="node.nodeId">
+          <label>Name</label>
+          <span>&nbsp;</span>
+          <input type="text" class="input-name" placeholder="Enter name" name="nodeName" :value="node.name">
+          <table v-if="options!=null && providers!=null">
+            <tr>
+              <td>Namespace</td>
+              <td>
+                <select name="namespace" v-model="node.namespace" style="width: 100%">
+                  <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Type</td>
+              <td>
+                <select name="type" v-model="node.type" style="width: 100%">
+                  <option v-for="type in Types" :key="type">{{type}}</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Provider</td>
+              <td>
+                <select name="provider" v-model="node.provider" style="width: 100%">
+                  <option v-for="provider in providers.Provider" :key="provider">{{provider.name}}</option>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td>Location</td>
+              <td>
+                <select name="location" v-model="node.location" style="width: 100%">
+                  <option v-for="location in Location" :key="location">{{location}}</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div v-if="pipe!=null">
+          <input type="hidden" class="input-name" placeholder="Enter name" name="formType" value="pipeform">
+          <table>
+            <tr>
+              <td>Data Transfer Type</td>
+              <td>
+                <select name="pipetype" v-model="pipe.type" style="width: 100%">
+                  <option v-for="pipeType in pipeTypes" :key="pipeType">{{pipeType}}</option>
+                </select>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <table id="propTable" style="width: 250px;">
+          <thead class="propTable-header" v-if="node!=null">
+          <tr>
+            <th>
+              <label><b>Key</b></label>
+            </th>
+            <th>
+              <label><b>Value</b></label>
+            </th>
+          </tr>
+          </thead>
+          <tbody class="propTable-body" :data-node="node.nodeId" v-if="node!=null">
+          <template v-for="prop in node.properties" :key="prop">
+            <tr :name="prop.key">
+              <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key"></td>
+              <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value"></td>
+              <td><button class="btn-propdelete" @click="deleteRow">x</button></td>
+            </tr>
+          </template>
+          </tbody>
+        </table>
+      </form>
+      <button class="btn-prop" @click="addRow" style="width:50%;" v-if="node!=null">+</button>
+    </div>
   </div>
 </template>
 
 <script>
+import store from "@/plugins/store";
+import $ from "jquery";
+
 export default {
-  name: "PropertyComponent"
+  name: "PropertyComponent",
+  data(){
+    return{
+      selectedNamespace:'',
+      Types:[],
+      pipeTypes:["push","pull"],
+      selectedType:'',
+      selectedProvider:'',
+      Location:[],
+      selectedLocation:'',
+      nodeProperties:[],
+      prop:{'key':'','value':''}
+    }
+  },
+  computed:{
+    node:function(){
+      return store.getters.GetNodeProp;
+    },
+    pipe:function(){
+      return store.getters.GetPipeProp;
+    },
+    options:function(){
+      return store.getters.GetOptions;
+    },
+    providers:function(){
+      return store.getters.GetProviders;
+    }
+  },
+  methods:{
+    addRow(){
+      console.log(this.node.properties[this.node.properties.length-1]);
+      this.node.properties.push(this.prop);
+    },
+    deleteRow(event){
+      event.target.closest("tr").remove();
+    },
+    saveProperty() {
+      let formData= $('form').serializeArray();
+      if(formData[0].name === "formType" && formData[0].value === "nodeform")
+        store.getters.GetEditor.addNodeProperties(formData);
+      else
+        store.getters.GetEditor.addPipeProperties({'pipe':this.pipe,'data':formData});
+    },
+    changeNameSpace(){
+      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.node.namespace))[0].type;
+    },
+    changeProvider(){
+      this.Location= (this.providers.Provider.filter((ps)=> ps.name=== this.node.provider))[0].location;
+    }
+  },
+  watch:{
+    'node.namespace':function(val){
+      if(val){
+        this.changeNameSpace();
+      }
+    },
+    'node.provider':function(val){
+      if(val){
+        this.changeProvider();
+      }
+    },
+    'node':function (val){
+      if(val){
+        console.log(this.node.properties)
+        this.nodeProperties = this.node.properties;
+      }
+      else{
+        console.log('node empty');
+        $('#propTable > tbody >tr').remove();
+      }
+    }
+  }
 }
 </script>
 
