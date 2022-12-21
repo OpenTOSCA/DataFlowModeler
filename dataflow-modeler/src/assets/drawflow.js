@@ -1366,9 +1366,9 @@ export default class Drawflow {
       pos_y: ele_pos_y,
     }
     if(json.class === 'input')
-      json.properties.push({'key':'data size','value':''});
+      json.properties.push({'key':'DataSize','value':''});
     else if (json.class === 'filter')
-      json.properties.push({'key':'data factor','value':''});
+      json.properties.push({'key':'DataFactor','value':''});
     store.commit("SetPropertyData",{'id':json.name});
     this.drawflow.drawflow[this.module].data[newNodeId] = json;
     this.dispatch('nodeCreated', newNodeId);
@@ -1727,6 +1727,7 @@ export default class Drawflow {
   }
 
   addNodeProperties(nodeData){
+    debugger;
     let nodeId=nodeData[1].value;
     debugger;
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
@@ -2093,7 +2094,6 @@ export default class Drawflow {
       }
 
       dataJson['drawflow']['Home']['data']=data;
-      debugger;
     }
     return dataJson;
 
@@ -2102,11 +2102,17 @@ export default class Drawflow {
   convertJSONToXML(data){
     let doc = document.implementation.createDocument("", "", null);
     let headTag = doc.createElement("DataflowModel");
-    headTag.setAttribute("id","");
     let filterTag=doc.createElement("Filters");
     let inputTag=doc.createElement("Inputs");
     let outputTag=doc.createElement("Outputs");
     let pipeTag=doc.createElement("Pipes");
+    let namespace = (store.getters.GetNamespace).Namespace;
+    for(let i=0;i<namespace.length;i++){
+      debugger;
+      headTag.setAttribute(`xmlns:${namespace[i].id}`,namespace[i].name);
+    }
+    headTag.setAttribute("id","");
+    debugger
     let innerData=data['drawflow']['Home']['data'];
     let nodeId={};
     let pipeData=[];
@@ -2209,6 +2215,7 @@ export default class Drawflow {
     headTag.appendChild(outputTag);
     headTag.appendChild(filterTag);
     headTag.appendChild(pipeTag);
+    debugger;
     doc.appendChild(headTag);
     let xmlData = new XMLSerializer().serializeToString(doc);
     return xmlData;

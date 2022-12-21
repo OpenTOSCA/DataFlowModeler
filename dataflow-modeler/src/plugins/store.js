@@ -51,7 +51,7 @@ const store = createStore({
             state.pipeProperty=pipe
         }
         ,
-        SetOptions(state,options){
+        SetNamespace(state,options){
             state.options=options
         }
         ,
@@ -78,7 +78,7 @@ const store = createStore({
             return state.pipeProperty
         }
         ,
-        GetOptions: function (state){
+        GetNamespace: function (state){
             return state.options
         }
         ,

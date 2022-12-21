@@ -15,7 +15,7 @@
               <td>Namespace</td>
               <td>
                 <select name="namespace" v-model="node.namespace" style="width: 100%">
-                  <option v-for="ns in options.Namespace" :key="ns">{{ns.name}}</option>
+                  <option v-for="ns in options.Namespace" :key="ns" :value="ns.id">{{ns.name}}</option>
                 </select>
               </td>
             </tr>
@@ -70,11 +70,11 @@
           </tr>
           </thead>
           <tbody class="propTable-body" :data-node="node.nodeId" v-if="node!=null">
-          <template v-for="prop in node.properties" :key="prop">
+          <template v-for="prop in node.properties" :key="prop.key">
             <tr :name="prop.key">
-              <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key"></td>
-              <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value"></td>
-              <td><button class="btn-propdelete" @click="deleteRow">x</button></td>
+              <td><input type="text" class="input-field" placeholder="Enter Key" name="key" :value="prop.key" v-on:change="updateProp($event, prop)"></td>
+              <td><input type="text" class="input-field" placeholder="Enter Value" name="value" :value="prop.value" v-on:change="updateProp($event, prop)"></td>
+              <td><button class="btn-propdelete" type="button" @click="deleteRow">x</button></td>
             </tr>
           </template>
           </tbody>
@@ -101,18 +101,18 @@ export default {
       Location:[],
       selectedLocation:'',
       nodeProperties:[],
-      prop:{'key':'','value':''}
+      node:null
     }
   },
   computed:{
-    node:function(){
+    nodeSelected:function(){
       return store.getters.GetNodeProp;
     },
     pipe:function(){
       return store.getters.GetPipeProp;
     },
     options:function(){
-      return store.getters.GetOptions;
+      return store.getters.GetNamespace;
     },
     providers:function(){
       return store.getters.GetProviders;
@@ -120,8 +120,7 @@ export default {
   },
   methods:{
     addRow(){
-      console.log(this.node.properties[this.node.properties.length-1]);
-      this.node.properties.push(this.prop);
+      this.node.properties.push({'key':'','value':''});
     },
     deleteRow(event){
       event.target.closest("tr").remove();
@@ -134,15 +133,26 @@ export default {
         store.getters.GetEditor.addPipeProperties({'pipe':this.pipe,'data':formData});
     },
     changeNameSpace(){
-      this.Types= (this.options.Namespace.filter((ns)=> ns.name=== this.node.namespace))[0].type;
+      this.Types= (this.options.Namespace.filter((ns)=> ns.id === this.node.namespace))[0].type;
     },
     changeProvider(){
       this.Location= (this.providers.Provider.filter((ps)=> ps.name=== this.node.provider))[0].location;
+    },
+    updateProp(event, prop){
+      let index = this.node.properties.findIndex(p=> p.key == prop.key);
+      if(event.target.name == 'key')
+      {
+        this.node.properties[index].key = event.target.value;
+      }
+      else{
+        this.node.properties[index].value = event.target.value;
+      }
     }
   },
   watch:{
     'node.namespace':function(val){
       if(val){
+        console.log(val)
         this.changeNameSpace();
       }
     },
@@ -151,16 +161,19 @@ export default {
         this.changeProvider();
       }
     },
-    'node':function (val){
-      if(val){
-        console.log(this.node.properties)
-        this.nodeProperties = this.node.properties;
-      }
-      else{
-        console.log('node empty');
-        $('#propTable > tbody >tr').remove();
-      }
+    'nodeSelected':function (val){
+      this.node = JSON.parse(JSON.stringify(this.nodeSelected));
     }
+    // 'node':function (val){
+    //   if(val){
+    //     console.log(this.node.properties)
+    //     this.nodeProperties = this.node.properties;
+    //   }
+    //   else{
+    //     console.log('node empty');
+    //     $('#propTable > tbody >tr').remove();
+    //   }
+    // }
   }
 }
 </script>

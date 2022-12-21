@@ -190,7 +190,7 @@ export default {
         let a = document.createElement("a");
         let file = new Blob([data], {type: "application/xml;charset=utf-8"});
         a.href = URL.createObjectURL(file);
-        a.download = this.filename;
+        a.download = this.filename+'.xml';
         a.click();
       }
       else{

@@ -32,7 +32,7 @@ export default {
       axios
           .get("Provider.json")
     ]).then(axios.spread((response1,response2) =>{
-          store.commit("SetOptions",response1.data)
+          store.commit("SetNamespace",response1.data)
           store.commit("SetProviders",response2.data)
         }));
   }
