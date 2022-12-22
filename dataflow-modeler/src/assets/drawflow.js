@@ -143,7 +143,6 @@ export default class Drawflow {
   /* End Mobile Zoom */
   load() {
     for (let key in this.drawflow.drawflow[this.module].data) {
-      debugger;
       this.addNodeImport(this.drawflow.drawflow[this.module].data[key], this.precanvas);
     }
 
@@ -281,7 +280,6 @@ export default class Drawflow {
         this.editor_selected = true;
         break;
       case 'main-path':
-        debugger;
         if(this.node_selected != null) {
           this.node_selected.classList.remove("selected");
           this.node_selected = null;
@@ -725,48 +723,6 @@ export default class Drawflow {
     path.setAttributeNS(null, 'd', lineCurve);
 
   }
-
-  // addConnection(id_output, id_input, output_class, input_class) {
-  //   let nodeOneModule = this.getModuleFromNodeId(id_output);
-  //   let nodeTwoModule = this.getModuleFromNodeId(id_input);
-  //   if(nodeOneModule === nodeTwoModule) {
-  //
-  //     let dataNode = this.getNodeFromId(id_output);
-  //     let exist = false;
-  //     for(let checkOutput in dataNode.outputs[output_class].connections){
-  //       let connectionSearch = dataNode.outputs[output_class].connections[checkOutput]
-  //       if(connectionSearch.node == id_input && connectionSearch.output == input_class) {
-  //           exist = true;
-  //       }
-  //     }
-  //     // Check connection exist
-  //     if(exist === false) {
-  //       //Create Connection
-  //       this.drawflow.drawflow[nodeOneModule].data[id_output].outputs[output_class].connections.push( {"node": id_input.toString(), "output": input_class});
-  //       this.drawflow.drawflow[nodeOneModule].data[id_input].inputs[input_class].connections.push( {"node": id_output.toString(), "input": output_class});
-  //
-  //       if(this.module === nodeOneModule) {
-  //       //Draw connection
-  //         let connection = document.createElementNS('http://www.w3.org/2000/svg',"svg");
-  //         let path = document.createElementNS('http://www.w3.org/2000/svg',"path");
-  //         path.classList.add("main-path");
-  //         path.setAttributeNS(null, 'd', '');
-  //         // path.innerHTML = 'a';
-  //         connection.classList.add("connection");
-  //         connection.classList.add("node_in_node-"+id_input);
-  //         connection.classList.add("node_out_node-"+id_output);
-  //         connection.classList.add(output_class);
-  //         connection.classList.add(input_class);
-  //         connection.appendChild(path);
-  //         this.precanvas.appendChild(connection);
-  //         this.updateConnectionNodes('node-'+id_output);
-  //         this.updateConnectionNodes('node-'+id_input);
-  //       }
-  //       debugger;
-  //       this.dispatch('connectionCreated', { output_id: id_output, input_id: id_input, output_class:  output_class, input_class: input_class});
-  //     }
-  //   }
-  // }
 
   updateConnectionNodes(id) {
 
@@ -1379,7 +1335,6 @@ export default class Drawflow {
   }
 
   addNodeImport (dataNode, precanvas) {
-    debugger;
     const parent = document.createElement('div');
     parent.classList.add("parent-node");
 
@@ -1505,7 +1460,6 @@ export default class Drawflow {
     //node.appendChild(properties);
     node.style.top = dataNode.pos_y + "px";
     node.style.left = dataNode.pos_x + "px";
-    debugger;
     parent.appendChild(node);
     this.precanvas.appendChild(parent);
   }
@@ -1727,9 +1681,7 @@ export default class Drawflow {
   }
 
   addNodeProperties(nodeData){
-    debugger;
     let nodeId=nodeData[1].value;
-    debugger;
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
     for (let i=0; i<nodeData.length; i++) {
       switch(nodeData[i].name){
@@ -1760,7 +1712,6 @@ export default class Drawflow {
   }
 
   addPipeProperties(pipeData){
-    debugger;
     console.log(pipeData);
 
     this.drawflow.drawflow[this.module].data[pipeData.pipe.input_id].inputs[pipeData.pipe.input_class].connections = [];
@@ -2065,9 +2016,7 @@ export default class Drawflow {
                 case 'properties':
                   let props=subchildNodes[k].childNodes;
                   for(let l=0;l<props.length;l++){
-                    debugger;
                     objElements["properties"].push({"key":props[l].childNodes[0].innerHTML,"value":props[l].childNodes[1].innerHTML});
-                    //objElements["properties"].push({"key":props[l].nodeName,"value":props[l].innerHTML});
                   }
                   break;
                 case 'typenode':
@@ -2078,7 +2027,6 @@ export default class Drawflow {
                   objElements[subchildNodes[k].nodeName]= parseInt(subchildNodes[k].innerHTML);
                   break;
                 case 'id':
-                  debugger;
                   item_id= parseInt(subchildNodes[k].innerHTML);
                   objElements[subchildNodes[k].nodeName]= parseInt(subchildNodes[k].innerHTML);
                   break;
@@ -2087,7 +2035,6 @@ export default class Drawflow {
               }
 
             }
-            debugger;
             data[item_id]=objElements;
           }
         }
@@ -2112,12 +2059,12 @@ export default class Drawflow {
       headTag.setAttribute(`xmlns:${namespace[i].id}`,namespace[i].name);
     }
     headTag.setAttribute("id","");
-    debugger
     let innerData=data['drawflow']['Home']['data'];
     let nodeId={};
     let pipeData=[];
     let pipeCount=0;
     for(let item in innerData){
+      debugger;
       nodeId[parseInt(innerData[item]['id'])]=innerData[item]['name'];
       let subTag = doc.createElement(innerData[item]['class']);
       subTag.setAttribute("id",innerData[item]['name']);
@@ -2129,10 +2076,8 @@ export default class Drawflow {
         switch(key){
           case 'inputs':
             if(Object.keys(innerData[item][key]).length){
-              debugger;
               let inConnection=innerData[item][key]['input_1']['connections'];
               for(let key in inConnection){
-                debugger;
                 let found= pipeData.some(el=>(el.source=== parseInt(inConnection[key]['node']) && el.target === parseInt(innerData[item]['id'])));
                 if(!found){
                   pipeCount+=1;
@@ -2145,10 +2090,8 @@ export default class Drawflow {
             break;
           case 'outputs':
             if(Object.keys(innerData[item][key]).length){
-              debugger;
               let outConnection=innerData[item][key]['output_1']['connections'];
               for(let key in outConnection){
-                debugger;
                 let found= pipeData.some(el=>(el.source===parseInt(innerData[item]['id']) && el.target===parseInt(outConnection[key]['node'])));
                 if(!found){
                   pipeCount+=1;
@@ -2215,7 +2158,6 @@ export default class Drawflow {
     headTag.appendChild(outputTag);
     headTag.appendChild(filterTag);
     headTag.appendChild(pipeTag);
-    debugger;
     doc.appendChild(headTag);
     let xmlData = new XMLSerializer().serializeToString(doc);
     return xmlData;

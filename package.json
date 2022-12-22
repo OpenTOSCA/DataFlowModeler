@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "drawflow": "^0.0.58",
-    "vuex": "^4.0.2"
-  }
-}
