@@ -20,4 +20,4 @@ RUN npm run build
 
 
 EXPOSE 8080
-CMD node dist/Newgen.js && http-server dist
+CMD http-server dist

@@ -28,7 +28,7 @@ export default {
     resetState();
     axios.all([
       axios
-          .get("NewNamespace.json"),
+          .get("Namespace.json"),
       axios
           .get("Provider.json")
     ]).then(axios.spread((response1,response2) =>{

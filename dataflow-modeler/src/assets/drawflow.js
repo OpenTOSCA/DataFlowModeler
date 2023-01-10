@@ -2068,7 +2068,7 @@ export default class Drawflow {
       nodeId[parseInt(innerData[item]['id'])]=innerData[item]['name'];
       let subTag = doc.createElement(innerData[item]['class']);
       subTag.setAttribute("id",innerData[item]['name']);
-      subTag.setAttribute("type",innerData[item]['namespace']+':'+innerData[item]['type']);
+      subTag.setAttribute("type",innerData[item]['type'] ? innerData[item]['namespace']+':'+innerData[item]['type']:"");
       subTag.setAttribute("location",innerData[item]['location']);
       subTag.setAttribute("provider",innerData[item]['provider']);
       for(let key in innerData[item]){
