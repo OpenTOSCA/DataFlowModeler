@@ -58,7 +58,8 @@ export default {
 
     store.getters.GetEditor.start();
     store.getters.GetEditor.import(this.dataToImport);
-    // Events!
+
+    // Events for the canvas component
     store.getters.GetEditor.on('nodeCreated', function(id) {
       console.log("Node created " + id);
     })
@@ -128,30 +129,6 @@ export default {
       console.log("Reroute removed " + id);
     })
 
-    /* Fix vertical lines */
-
-     /* eslint-disable */
-
-    // store.getters.GetEditor.curvature = 0;
-    // store.getters.GetEditor.reroute_curvature_start_end = 0;
-    // store.getters.GetEditor.reroute_curvature = 0;
-    //
-    // store.getters.GetEditor.createCurvature = function(start_pos_x, start_pos_y, end_pos_x, end_pos_y, curvature_value) {
-    //   let line_x = start_pos_x;
-    //   let line_y = start_pos_y;
-    //   let hx1=null;
-    //   let hx2=null;
-    //   let x = end_pos_x;
-    //   let y = end_pos_y;
-    //   var center_x = ((end_pos_x - start_pos_x)/2)+start_pos_x;
-    //   return ' M '+ line_x +' '+ line_y + ' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
-    //   return ' M ' + start_pos_x + ' ' + start_pos_y + ' L '+ center_x +' ' +  start_pos_y  + ' L ' + center_x + ' ' +  end_pos_y  + ' L ' + end_pos_x + ' ' + end_pos_y;
-    // }
-
-     /* eslint-disable */
-
-    /* End Fix vertical lines */
-
     let elements = document.getElementsByClassName('drag-drawflow');
     for (let i = 0; i < elements.length; i++) {
       elements[i].addEventListener('touchend', this.flowEvents.drop, false);
@@ -170,11 +147,14 @@ export default {
 
   },
   methods: {
+    // To select file from the explorer
     selectFile(){
       let file=document.getElementById("test");
       file.click();
 
     },
+
+    // To change the editing mode of the canvas
     changeMode() {
       if(this.lock_state) {
         this.lock_state = false;
@@ -184,6 +164,8 @@ export default {
         store.getters.GetEditor.editor_mode = 'fixed';
       }
     },
+
+    // To export the data to XML format
     ExportData(data){
       if(this.filename!=""){
         //let xmlData = this.helper.OBJtoXML(data);

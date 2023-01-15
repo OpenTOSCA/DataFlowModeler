@@ -21,8 +21,7 @@ export default {
   name: "SidePanelComponent",
   data(){
     return{
-      flowEvents: new FlowEvents(),
-      // -
+      flowEvents: new FlowEvents()
     }
   },
   mounted() {

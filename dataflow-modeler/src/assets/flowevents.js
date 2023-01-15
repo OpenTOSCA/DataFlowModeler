@@ -35,7 +35,6 @@ export default class FlowEvents{
     }
 
     //Canvas Events
-
     allowDrop(ev) {
         ev.preventDefault();
     }

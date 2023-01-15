@@ -15,6 +15,7 @@ const store = createStore({
         }
     },
     mutations: {
+        // store editor object
         SetEditor(state,editor){
             state.editor=editor
         },

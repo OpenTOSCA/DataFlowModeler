@@ -55,7 +55,6 @@ export default class Drawflow {
   }
 
   start () {
-    // console.info("Start Drawflow!!");
     this.container.classList.add("parent-drawflow");
     this.container.tabIndex = 0;
     this.precanvas = document.createElement('div');
@@ -649,7 +648,6 @@ export default class Drawflow {
           hx1 = line_x + Math.abs(x - line_x) * curvature;
           hx2 = x - Math.abs(x - line_x) * curvature;
         }
-        //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
 
         break
       case 'close':
@@ -660,7 +658,6 @@ export default class Drawflow {
           hx1 = line_x + Math.abs(x - line_x) * curvature;
           hx2 = x - Math.abs(x - line_x) * curvature;
         }
-        //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
         break;
       case 'other':
         if(start_pos_x >= end_pos_x) {
@@ -670,20 +667,15 @@ export default class Drawflow {
           hx1 = line_x + Math.abs(x - line_x) * curvature;
           hx2 = x - Math.abs(x - line_x) * curvature;
         }
-        //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
         break;
       default:
 
         hx1 = line_x + Math.abs(x - line_x) * curvature;
         hx2 = x - Math.abs(x - line_x) * curvature;
 
-        //return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
     }
-    // return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y;
 
     return ' M '+ line_x +' '+ line_y +' C '+ hx1 +' '+ line_y +' '+ hx2 +' ' + y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
-    // return ' M '+ line_x +' '+ line_y +' ' + x +'  ' + y +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-5)+'  L'+(x-20)+' '+ (y+5)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-3)+'  L'+(x-20)+' '+ (y+3)+' Z' +' M '+ (x-11)  + ' ' + y + ' L'+(x-20)+' '+ (y-1)+'  L'+(x-20)+' '+ (y+1)+' Z';
-    // return ' M ' + start_pos_x + ' ' + start_pos_y + ' L '+ center_x +' ' +  start_pos_y  + ' L ' + center_x + ' ' +  end_pos_y  + ' L ' + end_pos_x + ' ' + end_pos_y;
 
   }
 
@@ -1051,32 +1043,6 @@ export default class Drawflow {
     if(e.target.classList[0] === 'point') {
         this.removeReroutePoint(e.target);
     }
-
-    // if(this.node_selected!=null){
-    //   // var popUpdiv= document.getElementById('divPop');
-    //   // console.log(popUpdiv);
-    //   // //popUpdiv.css({ left: this.node_selected.offsetLeft + this.node_selected.offsetWidth + 10, top: this.node_selected.offsetTop + this.node_selected.offsetHeight + 10 });
-    //   //
-    //   // if(popUpdiv.style.display==='none'){
-    //   //   popUpdiv.setAttribute("style", "left: "+this.node_selected.offsetLeft + this.node_selected.offsetWidth + 10+"; width:"+this.node_selected.offsetTop + this.node_selected.offsetHeight + 10+";");
-    //   //   popUpdiv.style.display='block'
-    //   // }
-    //   // else{
-    //   //   popUpdiv.setAttribute("style", "z-index:500;position:absolute;display:none");
-    //   //   popUpdiv.style.display='none';
-    //   // }
-    //   // // let nodeSelect= document.getElementById(this.)
-    //   // // var pos=nodeSelect.offset();
-    //   // // var h=nodeSelect.height();
-    //   // // var w=nodeSelect.width();
-    //   if(this.node_selected.hasChildNodes()){
-    //
-    //   }
-    //   let deletebox = document.createElement('div');
-    //   deletebox.classList.add("drawflow-property");
-    //   deletebox.innerHTML = "x";
-    //   this.node_selected.appendChild(deletebox);
-    // }
   }
 
   createReroutePoint(ele) {
@@ -1680,6 +1646,9 @@ export default class Drawflow {
     this.updateConnectionNodes('node-'+id);
   }
 
+  /**
+   * Function to add properties to node
+   * **/
   addNodeProperties(nodeData){
     let nodeId=nodeData[1].value;
     this.drawflow.drawflow[this.module].data[nodeId].properties=[];
@@ -1711,6 +1680,9 @@ export default class Drawflow {
     this.load();
   }
 
+  /**
+   * Function to add Pipe Properties
+   * **/
   addPipeProperties(pipeData){
     console.log(pipeData);
 
@@ -1962,10 +1934,17 @@ export default class Drawflow {
     this.drawflow.drawflow[this.module] =  { "data": {} };
   }
 
+  /**
+   * Function to reset the canvas component
+   * **/
   clear () {
     this.precanvas.innerHTML = "";
     this.drawflow = { "drawflow": { "Home": { "data": {} }}};
   }
+
+  /**
+   * Function to export data bound to save button in canvas component
+   * **/
   export () {
     console.log('export');
     //const dataExport = JSON.parse(JSON.stringify(this.drawflow));
@@ -1974,6 +1953,9 @@ export default class Drawflow {
     return xmlData;
   }
 
+  /**
+   * Function to import data bound to load button in canvas component
+   * **/
   import (data, notifi = true) {
     this.clear();
     this.drawflow = JSON.parse(JSON.stringify(data));
@@ -1984,6 +1966,9 @@ export default class Drawflow {
     }
   }
 
+  /**
+   * Function to convert XML data from the file to JSON before importing into drawflow object
+   * **/
   convertXmlToJSON(dataXML){
     let dataJson=this.drawflow;
     let data={};
@@ -2046,6 +2031,9 @@ export default class Drawflow {
 
   }
 
+  /**
+   * Function to convert JSON to XML before exporting th data
+   * */
   convertJSONToXML(data){
     let doc = document.implementation.createDocument("", "", null);
     let headTag = doc.createElement("DataflowModel");

@@ -26,6 +26,7 @@ export default {
   },
   beforeMount() {
     resetState();
+    // load Namespace and Provider data from the JSON files
     axios.all([
       axios
           .get("Namespace.json"),

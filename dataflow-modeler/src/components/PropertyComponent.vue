@@ -119,12 +119,15 @@ export default {
     }
   },
   methods:{
+    // add rows to property table
     addRow(){
       this.node.properties.push({'key':'','value':''});
     },
+    // delete rows from property table
     deleteRow(event){
       event.target.closest("tr").remove();
     },
+    // save node or pipe properties
     saveProperty() {
       let formData= $('form').serializeArray();
       if(formData[0].name === "formType" && formData[0].value === "nodeform")
@@ -132,15 +135,18 @@ export default {
       else
         store.getters.GetEditor.addPipeProperties({'pipe':this.pipe,'data':formData});
     },
+    // function to populate type according to the namespace selected
     changeNameSpace(){
       this.Types= (this.options.Namespace.filter((ns)=> ns.id === this.node.namespace))[0].type;
     },
+    // function to populate location according to the provider selected
     changeProvider(){
       this.Location= (this.providers.Provider.filter((ps)=> ps.name=== this.node.provider))[0].location;
     },
+    // update properties
     updateProp(event, prop){
-      let index = this.node.properties.findIndex(p=> p.key == prop.key);
-      if(event.target.name == 'key')
+      let index = this.node.properties.findIndex(p=> p.key === prop.key);
+      if(event.target.name === 'key')
       {
         this.node.properties[index].key = event.target.value;
       }
@@ -164,16 +170,6 @@ export default {
     'nodeSelected':function (val){
       this.node = JSON.parse(JSON.stringify(this.nodeSelected));
     }
-    // 'node':function (val){
-    //   if(val){
-    //     console.log(this.node.properties)
-    //     this.nodeProperties = this.node.properties;
-    //   }
-    //   else{
-    //     console.log('node empty');
-    //     $('#propTable > tbody >tr').remove();
-    //   }
-    // }
   }
 }
 </script>

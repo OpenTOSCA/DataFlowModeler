@@ -1,5 +1,7 @@
 import store from "@/plugins/store";
 export default class Helper{
+    /**
+     * Function to add node data to drawflow object**/
     addNodeToDrawFlow(name, pos_x, pos_y){
         if(store.getters.GetEditor.editor_mode === 'fixed') {
             return false;
