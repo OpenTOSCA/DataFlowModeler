@@ -1,0 +1,17 @@
+version: '3.3'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DIRPATH: ${DIRPATH}
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/app/node_modules"
+      - ".:/app"
+    env_file:
+      - .env
