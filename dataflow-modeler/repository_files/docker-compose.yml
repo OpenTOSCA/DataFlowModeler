@@ -1,10 +1,12 @@
 version: '3.3'
 services:
   web:
-    image: dataflow-editor-base:latest
+    image: dataflow-editor:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: DockerfileNamespace
+      args:
+        DIRPATH: ${DIRPATH}
     stdin_open: true
     tty: true
     ports:
@@ -12,3 +14,5 @@ services:
     volumes:
       - "/app/node_modules"
       - ".:/app"
+    env_file:
+      - .env
