@@ -128,3 +128,4 @@ pnpm-debug.log*
 *.sw?
 
 tosca-definitions-public-master
+dataflow-modeler/public/Namespace.json

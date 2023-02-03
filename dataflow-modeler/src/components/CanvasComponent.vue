@@ -3,7 +3,7 @@
       <div class="menuClass">
         <label>Name</label>
         <input class="text-filepath" v-model="filename" placeholder="Enter the file name" type="text" style="flex: 1;font-size: 100%"><br><br>
-        <div class="btn-save" v-on:click="ExportData($store.getters.GetEditor.export())">Save</div>
+        <div class="btn-save" v-on:click="ExportData($store.getters.GetEditor.export(filename))">Save</div>
         <input type="file" id="test" style="display:none" accept=".xml">
         <div class="btn-export" v-on:click="selectFile">Load</div>
       </div>
@@ -138,7 +138,7 @@ export default {
     let fileInput = document.getElementById('test');
     fileInput.onchange = async() => {
       const selectedFile=fileInput.files[0];
-      this.filename=selectedFile.name;
+      this.filename=selectedFile.name.replace(/\.[^/.]+$/, "");
       const fileContent = await selectedFile.text();
       let parser = new DOMParser();
       let dataToImport=  store.getters.GetEditor.convertXmlToJSON(parser.parseFromString(fileContent,"application/xml"));
@@ -167,7 +167,7 @@ export default {
 
     // To export the data to XML format
     ExportData(data){
-      if(this.filename!=""){
+      if(this.filename!==""){
         //let xmlData = this.helper.OBJtoXML(data);
         let a = document.createElement("a");
         let file = new Blob([data], {type: "application/xml;charset=utf-8"});

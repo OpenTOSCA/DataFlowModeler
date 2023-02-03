@@ -1,5 +1,6 @@
 /* eslint-disable */
 import store from "@/plugins/store";
+
 export default class Drawflow {
   constructor(container, render = null, parent = null) {
     this.events = {};
@@ -1945,10 +1946,10 @@ export default class Drawflow {
   /**
    * Function to export data bound to save button in canvas component
    * **/
-  export () {
+  export (filename) {
     console.log('export');
     //const dataExport = JSON.parse(JSON.stringify(this.drawflow));
-    let xmlData=this.convertJSONToXML(this.drawflow);
+    let xmlData=this.convertJSONToXML(this.drawflow, filename);
     this.dispatch('export', xmlData);
     return xmlData;
   }
@@ -1975,18 +1976,24 @@ export default class Drawflow {
     if(dataXML!=null){
       let elements=dataXML.firstChild.childNodes;
       for(let i=0; i<elements.length;i++){
-        if(elements[i].nodeName!="Pipes"){
+        if(elements[i].nodeName!=="Pipes"){
           let childNodes=elements[i].childNodes;
           for(let j=0; j<childNodes.length;j++){
             let item_id=0;
             let subchildNodes=childNodes[j].childNodes;
             let objElements={properties:[]};
-            let typeSplit=(childNodes[j].getAttribute('type'));
-            let lastIndex=typeSplit.lastIndexOf(':');
-            objElements['namespace']=typeSplit.slice(0,lastIndex);
-            objElements['type']=typeSplit.slice(lastIndex+1);
-            objElements['provider']=childNodes[j].getAttribute('provider');
-            objElements['location']=childNodes[j].getAttribute('location');
+            if(childNodes[j].getAttribute('type')){
+              let typeSplit=(childNodes[j].getAttribute('type'));
+              let lastIndex=typeSplit.lastIndexOf(':');
+              objElements['namespace']=typeSplit.slice(0,lastIndex);
+              objElements['type']=typeSplit.slice(lastIndex+1);
+            }
+            else{
+              objElements['namespace']="";
+              objElements['type']="";
+            }
+            objElements['provider']=childNodes[j].getAttribute('provider')? childNodes[j].getAttribute('provider'):"" ;
+            objElements['location']=childNodes[j].getAttribute('location')? childNodes[j].getAttribute('location'):"";
             for(let k=0;k<subchildNodes.length;k++){
               switch(subchildNodes[k].nodeName){
                 case 'inputs':
@@ -2034,19 +2041,19 @@ export default class Drawflow {
   /**
    * Function to convert JSON to XML before exporting th data
    * */
-  convertJSONToXML(data){
+  convertJSONToXML(data, filename){
     let doc = document.implementation.createDocument("", "", null);
     let headTag = doc.createElement("DataflowModel");
     let filterTag=doc.createElement("Filters");
-    let inputTag=doc.createElement("Inputs");
-    let outputTag=doc.createElement("Outputs");
+    // let inputTag=doc.createElement("Inputs");
+    // let outputTag=doc.createElement("Outputs");
     let pipeTag=doc.createElement("Pipes");
     let namespace = (store.getters.GetNamespace).Namespace;
     for(let i=0;i<namespace.length;i++){
       debugger;
       headTag.setAttribute(`xmlns:${namespace[i].id}`,namespace[i].name);
     }
-    headTag.setAttribute("id","");
+    headTag.setAttribute("id",filename);
     let innerData=data['drawflow']['Home']['data'];
     let nodeId={};
     let pipeData=[];
@@ -2054,11 +2061,15 @@ export default class Drawflow {
     for(let item in innerData){
       debugger;
       nodeId[parseInt(innerData[item]['id'])]=innerData[item]['name'];
-      let subTag = doc.createElement(innerData[item]['class']);
-      subTag.setAttribute("id",innerData[item]['name']);
-      subTag.setAttribute("type",innerData[item]['type'] ? innerData[item]['namespace']+':'+innerData[item]['type']:"");
-      subTag.setAttribute("location",innerData[item]['location']);
-      subTag.setAttribute("provider",innerData[item]['provider']);
+      // let subTag = doc.createElement(innerData[item]['class']);
+      let subTag = doc.createElement("Filter");
+      if(innerData[item]['name']) subTag.setAttribute("id",innerData[item]['name']);
+      if(innerData[item]['type'])
+        subTag.setAttribute("type",innerData[item]['type'] ? innerData[item]['namespace']+':'+innerData[item]['type']:"");
+      if(innerData[item]['location'])
+        subTag.setAttribute("location",innerData[item]['location']);
+      if(innerData[item]['provider'])
+        subTag.setAttribute("provider",innerData[item]['provider']);
       for(let key in innerData[item]){
         let childTag=doc.createElement(key);
         switch(key){
@@ -2117,10 +2128,10 @@ export default class Drawflow {
         subTag.appendChild(childTag);
         switch(innerData[item]['class']){
           case 'input':
-            inputTag.appendChild(subTag);
+            filterTag.appendChild(subTag);
             break;
           case 'output':
-            outputTag.appendChild(subTag);
+            filterTag.appendChild(subTag);
             break;
           case 'filter':
             filterTag.appendChild(subTag);
@@ -2142,13 +2153,12 @@ export default class Drawflow {
       pipeTag.appendChild(innerPipeTag);
     });
 
-    headTag.appendChild(inputTag);
-    headTag.appendChild(outputTag);
+    // headTag.appendChild(inputTag);
+    // headTag.appendChild(outputTag);
     headTag.appendChild(filterTag);
     headTag.appendChild(pipeTag);
     doc.appendChild(headTag);
-    let xmlData = new XMLSerializer().serializeToString(doc);
-    return xmlData;
+    return new XMLSerializer().serializeToString(doc);
 
   }
 

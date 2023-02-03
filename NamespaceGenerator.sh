@@ -2,8 +2,7 @@
 
 urldecode() { : "${*//+/ }"; echo -e "${_//%/\\x}"; }
 
-#search_dir="$1"
-search_dir="nodetypes"
+search_dir="$1"
 i=0
 inner=(list)
 for folder in "$search_dir"/*;

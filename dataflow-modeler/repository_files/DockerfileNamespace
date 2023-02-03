@@ -1,4 +1,5 @@
-FROM dataflow-editor-base:latest
+# pull the base image we build
+FROM dataflow-editor-base:latest as build-stage
 
 # enevironment variable that has nodetype directory path
 ARG DIRPATH
@@ -17,14 +18,18 @@ RUN apt-get -y install jq
 RUN chmod +x NamespaceGenerator.sh
 
 # run the bash script to generate Namespace.json
-RUN bash NamespaceGenerator.sh
+RUN bash NamespaceGenerator.sh /app/nodetypes
 
 # remove the nodetype directory
 RUN rm -r nodetypes
 
 RUN npm run build
 
-EXPOSE 8080
+#production stage
+FROM nginx:stable-alpine as production-stage
 
-# start the server
-CMD http-server dist
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
