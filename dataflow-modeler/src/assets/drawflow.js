@@ -2005,7 +2005,7 @@ export default class Drawflow {
                     objElements[subchildNodes[k].nodeName]=JSON.parse(subchildNodes[k].innerHTML);
                   }
                   break;
-                case 'properties':
+                case 'Properties':
                   let props=subchildNodes[k].childNodes;
                   for(let l=0;l<props.length;l++){
                     objElements["properties"].push({"key":props[l].childNodes[0].innerHTML,"value":props[l].childNodes[1].innerHTML});
@@ -2043,10 +2043,8 @@ export default class Drawflow {
    * */
   convertJSONToXML(data, filename){
     let doc = document.implementation.createDocument("", "", null);
-    let headTag = doc.createElement("DataflowModel");
+    let headTag = doc.createElement("DataFlowModel");
     let filterTag=doc.createElement("Filters");
-    // let inputTag=doc.createElement("Inputs");
-    // let outputTag=doc.createElement("Outputs");
     let pipeTag=doc.createElement("Pipes");
     let namespace = (store.getters.GetNamespace).Namespace;
     for(let i=0;i<namespace.length;i++){
@@ -2061,7 +2059,6 @@ export default class Drawflow {
     for(let item in innerData){
       debugger;
       nodeId[parseInt(innerData[item]['id'])]=innerData[item]['name'];
-      // let subTag = doc.createElement(innerData[item]['class']);
       let subTag = doc.createElement("Filter");
       if(innerData[item]['name']) subTag.setAttribute("id",innerData[item]['name']);
       if(innerData[item]['type'])
@@ -2071,7 +2068,8 @@ export default class Drawflow {
       if(innerData[item]['provider'])
         subTag.setAttribute("provider",innerData[item]['provider']);
       for(let key in innerData[item]){
-        let childTag=doc.createElement(key);
+        let key_name =  key !== "properties" ? key : "Properties";
+        let childTag=doc.createElement(key_name);
         switch(key){
           case 'inputs':
             if(Object.keys(innerData[item][key]).length){
@@ -2126,17 +2124,7 @@ export default class Drawflow {
             break;
         }
         subTag.appendChild(childTag);
-        switch(innerData[item]['class']){
-          case 'input':
-            filterTag.appendChild(subTag);
-            break;
-          case 'output':
-            filterTag.appendChild(subTag);
-            break;
-          case 'filter':
-            filterTag.appendChild(subTag);
-            break;
-        }
+        filterTag.appendChild(subTag);
       }
 
     }
@@ -2152,9 +2140,6 @@ export default class Drawflow {
       innerPipeTag.appendChild(targetTag);
       pipeTag.appendChild(innerPipeTag);
     });
-
-    // headTag.appendChild(inputTag);
-    // headTag.appendChild(outputTag);
     headTag.appendChild(filterTag);
     headTag.appendChild(pipeTag);
     doc.appendChild(headTag);
